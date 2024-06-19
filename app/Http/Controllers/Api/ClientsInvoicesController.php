@@ -4,22 +4,21 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Clients;
 use Illuminate\Support\Facades\DB;
 
-class ClientController extends Controller
+class ClientsInvoicesController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $DebtorKey = $request->get('DebtorKey');
+        $ClientKey = $request->get('ClientKey');
         
-        $clients = DB::select('web.SP_DebtorMasterMemberClients @Debtorkey  = ?', [$DebtorKey]);
+        $invoices = DB::select('web.SP_DebtorMasterMemberClientsInvoices @ClientKey  = ?', [$ClientKey]);
         
         return response()->json([
-            'clients' => $clients,
+            'invoices' => $invoices,
         ]);
     }
 
