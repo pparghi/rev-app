@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\ClientsDebtorController;
 use App\Http\Controllers\Api\ClientsInvoicesController;
 use App\Http\Controllers\Api\DebtorsController;
 use App\Http\Controllers\Api\MemberDebtorsController;
@@ -19,3 +20,4 @@ Route::resource('clients', ClientController::class)->except(['create', 'store', 
 Route::resource('clientsinvoices', ClientsInvoicesController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('masterClients', MasterClientsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('memberClients', MemberClientsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
+Route::resource('ClientsDebtors', ClientsDebtorController ::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
