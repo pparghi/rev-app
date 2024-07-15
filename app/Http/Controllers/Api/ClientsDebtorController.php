@@ -18,7 +18,7 @@ class ClientsDebtorController extends Controller
         $clientsDebtor = DB::select('web.SP_ClientMasterMemberDebtors @ClientKey  = ?', [$ClientKey]);
         
         return response()->json([
-            'memberDebtor' => $clientsDebtor,
+            'clientsDebtor' => $clientsDebtor,
         ]);
     }
 
