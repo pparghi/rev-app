@@ -24,9 +24,12 @@ class DebtorsController extends Controller
 
         $data = DB::select('web.SP_DebtorMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?', [$offset, $perPage, $search, $sortBy, $sortOrder]);
 
+        $DebtoNoBuyDisputeList = DB::select('Web.SP_DebtoNoBuyDisputeList');
+
         $total = DB::select('web.SP_CountDebtorMasterDetails');
         
         return response()->json([
+            'DebtoNoBuyDisputeList' => $DebtoNoBuyDisputeList,
             'data' => $data,
             'total' => $total[0],
             'per_page' => $perPage,
