@@ -72,9 +72,20 @@ class DebtorsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function updateCreditLimit(Request $request)
     {
-        //
+        dump("test------");
+        dd($request->all());
+        try {
+            DB::statement('CALL web.SP_DebtorChangeTotalCreditLimit');
+        } catch(\Exception $e) {
+            return response()->json(['error' => 'Failed to update creditLimit', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateAccountStatus(Request $request, string $id)
+    {
+        
     }
 
     /**
