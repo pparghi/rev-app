@@ -74,18 +74,20 @@ class DebtorsController extends Controller
      */
     public function updateCreditLimit(Request $request)
     {
-        dump("test------");
-        dd($request->all());
         try {
-            DB::statement('CALL web.SP_DebtorChangeTotalCreditLimit');
+            DB::statement('web.SP_DebtorChangeTotalCreditLimit @DebtorKey = ?, @TotalCreditLimit = ?, @CredAppBy = ?', [$request->DebtorKey, $request->TotalCreditLimit, $request->CredAppBy]);
         } catch(\Exception $e) {
             return response()->json(['error' => 'Failed to update creditLimit', 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function updateAccountStatus(Request $request, string $id)
+    public function updateAccountStatus(Request $request)
     {
-        
+        try {
+            DB::statement('web.SP_DebtorChangeNoBuyDispute @DebtorKey = ?, @NoBuyDisputeKey = ?, @CredAppBy = ?', [$request->DebtorKey, $request->NoBuyDisputeKey, $request->CredAppBy]);
+        } catch(\Exception $e) {
+            return response()->json(['error' => 'Failed to update creditLimit', 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**
