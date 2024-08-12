@@ -64,6 +64,15 @@ class DebtorDocumentsController extends Controller
         //
     }
 
+    public function uploadDebtorDocuments(Request $request)
+    {
+        try {
+            DB::statement('web.SP_DebtorMasterAddDocument @DebtorKey = ?, @Descr = ?, @FileName = ?, @DocCatKey = ?', [$request->DebtorKey, $request->Descr, $request->FileName, $request->DocCatKey]);
+        } catch(\Exception $e) {
+            return response()->json(['error' => 'Failed to upload documents', 'message' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      */

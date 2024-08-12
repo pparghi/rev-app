@@ -24,4 +24,5 @@ Route::resource('clientsinvoices', ClientsInvoicesController::class)->except(['c
 Route::resource('masterClients', MasterClientsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('memberClients', MemberClientsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('ClientsDebtors', ClientsDebtorController ::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
-Route::resource('documentsList', DebtorDocumentsController ::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
+Route::get('documentsList', [DebtorDocumentsController ::class, 'index']);
+Route::post('debtorMasterAddDocument', [DebtorDocumentsController ::class, 'uploadDebtorDocuments']);
