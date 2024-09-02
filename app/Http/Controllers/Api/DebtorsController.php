@@ -14,28 +14,53 @@ class DebtorsController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {        
-        $page = $request->get('page', 1);
-        $perPage = $request->get('per_page', 25);
-        $offset = ($page * $perPage)/$perPage;
-        $search = $request->input('search') ? $request->input('search') : '';
-        $sortBy = $request->input('sortBy', 'Debtor');
-        $sortOrder = $request->input('sortOrder', 'ASC');
+    {          
+        $mail = base64_decode($request->token);
 
-        $data = DB::select('web.SP_DebtorMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?', [$offset, $perPage, $search, $sortBy, $sortOrder]);
+        if ($mail != "") {
+            $user = DB::select('web.SP_ValidateUserEmail @email = ?', [$mail]);
+        } else {
+            $user = [];
+        }
+        if(count($user) > 0){                     
+            $page = $request->get('page', 1);
+            $perPage = $request->get('per_page', 25);
+            $offset = ($page * $perPage)/$perPage;
+            $search = $request->input('search') ? $request->input('search') : '';
+            $sortBy = $request->input('sortBy', 'Debtor');
+            $sortOrder = $request->input('sortOrder', 'ASC');
 
-        $DebtoNoBuyDisputeList = DB::select('Web.SP_DebtoNoBuyDisputeList');
+            $data = DB::select('web.SP_DebtorMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?', [$offset, $perPage, $search, $sortBy, $sortOrder]);
 
-        $total = DB::select('web.SP_CountDebtorMasterDetails');
+            $DebtoNoBuyDisputeList = DB::select('Web.SP_DebtoNoBuyDisputeList');
+
+            $total = DB::select('web.SP_CountDebtorMasterDetails');
+            
+            $response = response()->json([
+                'DebtoNoBuyDisputeList' => $DebtoNoBuyDisputeList,
+                'data' => $data,
+                'total' => $total[0],
+                'per_page' => $perPage,
+                'current_page' => $page
+            ]);
+
+            return $response;   
+        }else{
+            return response()->json(['message' => 'User not found'], 404);
+        }        
+    }
+
+    public function debtorContacts(Request $request)
+    {      
+
+        $debtorContactsData = DB::select('web.SP_InvoiceDebtorContactsDetails @Debtorkey = ?', [$request->DebtorKey]);
         
         return response()->json([
-            'DebtoNoBuyDisputeList' => $DebtoNoBuyDisputeList,
-            'data' => $data,
-            'total' => $total[0],
-            'per_page' => $perPage,
-            'current_page' => $page
+            'debtorContactsData' => $debtorContactsData,
         ]);
     }
+
+
 
     /**
      * Show the form for creating a new resource.

@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class DebtorDocumentsController extends Controller
 {
@@ -17,10 +21,22 @@ class DebtorDocumentsController extends Controller
         
         $documentsList = DB::select('web.SP_DebtorDocuments @Debtorkey  = ?', [$DebtorKey]);
         $documentsCat = DB::select('web.SP_DocumentCategory');
+        $documentsFolder = DB::select('web.SP_DocumentsFolder');
+
+        // foreach ($documentsList as $key => $value) {
+        //     $fileName = $value->Path . "/" . $value->DocHdrKey . '.' . pathinfo($value->FileName, PATHINFO_EXTENSION);
+        //     if (copy($fileName, storage_path('app/public/uploads'))) {
+        //         echo "File copied successfully.";
+        //     } else {
+        //         echo "Error copying file.";
+        //     }
+            
+        // }
         
         return response()->json([
             'documentsList' => $documentsList,
             'documentsCat' => $documentsCat,
+            'documentsFolder' => $documentsFolder
         ]);
     }
 
@@ -67,9 +83,33 @@ class DebtorDocumentsController extends Controller
     public function uploadDebtorDocuments(Request $request)
     {
         try {
-            DB::statement('web.SP_DebtorMasterAddDocument @DebtorKey = ?, @Descr = ?, @FileName = ?, @DocCatKey = ?', [$request->DebtorKey, $request->Descr, $request->FileName, $request->DocCatKey]);
-        } catch(\Exception $e) {
-            return response()->json(['error' => 'Failed to upload documents', 'message' => $e->getMessage()], 500);
+            $request->validate([
+                'file' => 'required|file|mimes:pdf,doc,docx,jpg,png,jpeg|max:2048', // Update mimes as needed
+            ]);    
+            $file = $request->file('file');
+                        
+            $destinationPath = $request->DocFolderPath; // Ensure this path exists and is writable
+            $fileName = $file->getClientOriginalName();
+            $cdt = date('Y-m-d H:i:s');
+
+            DB::statement('web.SP_DebtorMasterAddDocument @DebtorKey = ?, @Descr = ?, @FileName = ?, @DocCatKey = ?, @cdt = ?', [$request->DebtorKey, $request->Descr, $fileName, $request->DocCatKey, $cdt]);
+
+            $docHdrKey = DB::select('web.SP_GetDocHdrKey @cdt = ?', [$cdt]);
+
+            foreach ($docHdrKey as $key => $value) {
+                $new_file_name = $value->DocHdrKey;
+            }
+
+            $file->move($destinationPath, $new_file_name . '.' . $file->getClientOriginalExtension());
+            
+            return response()->json([
+                'message' => 'File uploaded successfully!',
+                'file_path' => $destinationPath . '\\' . $fileName,
+            ]);
+        } catch(ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch(Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
