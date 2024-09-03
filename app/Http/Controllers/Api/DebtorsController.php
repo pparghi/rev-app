@@ -60,6 +60,16 @@ class DebtorsController extends Controller
         ]);
     }
 
+    public function debtorPayments(Request $request)
+    {      
+
+        $debtorPaymentsData = DB::select('web.SP_RelationshipPaymentsList @ClientKey = ?, @Debtorkey = ?', [$request->ClientKey, $request->DebtorKey]);
+        
+        return response()->json([
+            'debtorPaymentsData' => $debtorPaymentsData,
+        ]);
+    }
+
 
 
     /**

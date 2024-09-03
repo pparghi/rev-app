@@ -17,6 +17,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 Route::get('debtors', [DebtorsController::class, 'index']);
 Route::get('debtorContactsData', [DebtorsController::class, 'debtorContacts']);
+Route::get('debtorPaymentsData', [DebtorsController::class, 'debtorPayments']);
 Route::post('updateDebtorCreditLimit', [DebtorsController::class, 'updateCreditLimit']);
 Route::post('updateDebtorAccountStatus', [DebtorsController::class, 'updateAccountStatus']);
 Route::resource('memberDebtors', MemberDebtorsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
