@@ -20,7 +20,7 @@ Route::get('debtorContactsData', [DebtorsController::class, 'debtorContacts']);
 Route::get('debtorPaymentsData', [DebtorsController::class, 'debtorPayments']);
 Route::post('updateDebtorCreditLimit', [DebtorsController::class, 'updateCreditLimit']);
 Route::post('updateDebtorAccountStatus', [DebtorsController::class, 'updateAccountStatus']);
-Route::resource('memberDebtors', MemberDebtorsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
+Route::post('memberDebtors', [MemberDebtorsController::class, 'index']);
 Route::resource('clients', ClientController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('clientsinvoices', ClientsInvoicesController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('masterClients', MasterClientsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
