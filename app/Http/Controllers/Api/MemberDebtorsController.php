@@ -14,25 +14,13 @@ class MemberDebtorsController extends Controller
      */
     public function index(Request $request)
     {
-        $mail = base64_decode($request->token);
-
-        if ($mail != "") {
-            $user = DB::select('web.SP_ValidateUserEmail @email = ?', [$mail]);
-        } else {
-            $user = [];
-        }
-        if(count($user) > 0){
-
-            $DebtorKey = $request->get('DebtorKey');
-            
-            $memberDebtor = DB::select('web.SP_DebtorMasterMemberDetails @Debtorkey  = ?', [$DebtorKey]);
-            
-            return response()->json([
-                'memberDebtor' => $memberDebtor,
-            ]);
-        } else {
-                return response()->json(['message' => 'User not found'], 404);
-            }
+        $DebtorKey = $request->get('DebtorKey');
+        
+        $memberDebtor = DB::select('web.SP_DebtorMasterMemberDetails @Debtorkey  = ?', [$DebtorKey]);
+        
+        return response()->json([
+            'memberDebtor' => $memberDebtor,
+        ]);
     }
 
     /**
