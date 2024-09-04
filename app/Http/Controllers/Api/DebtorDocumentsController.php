@@ -84,7 +84,7 @@ class DebtorDocumentsController extends Controller
     {
         try {
             $request->validate([
-                'file' => 'required|file|mimes:pdf,doc,docx,jpg,png,jpeg|max:2048', // Update mimes as needed
+                'file' => 'required|file|mimes:xls,xlsx,pdf,doc,docx,jpg,png,jpeg|max:2048', // Update mimes as needed
             ]);    
             $file = $request->file('file');
                         
