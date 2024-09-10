@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\DebtorsController;
 use App\Http\Controllers\Api\MemberDebtorsController;
 use App\Http\Controllers\Api\MasterClientsController;
 use App\Http\Controllers\Api\MemberClientsController;
+use App\Http\Controllers\Api\MemberMasterDebtorController;
+use App\Http\Controllers\Api\MiscDataListController;
 use App\Http\Middleware\CorsMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,3 +30,5 @@ Route::resource('memberClients', MemberClientsController::class)->except(['creat
 Route::resource('ClientsDebtors', ClientsDebtorController ::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::get('documentsList', [DebtorDocumentsController ::class, 'index']);
 Route::post('debtorMasterAddDocument', [DebtorDocumentsController ::class, 'uploadDebtorDocuments']);
+Route::get('memberMasterDebtor', [MemberMasterDebtorController ::class, 'index']);
+Route::get('MiscDataList', [MiscDataListController ::class, 'index']);
