@@ -5,8 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Debtors;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
+use Spatie\Image\Image;
+
 
 class DebtorsController extends Controller
 {
@@ -70,6 +76,49 @@ class DebtorsController extends Controller
         ]);
     }
 
+    public function debtorPaymentsImages(Request $request)
+    {              
+        try {
+            $payment_images = [];           
+            $debtorPaymentImages = DB::select('Web.SP_DebtorPaymentsImages @PmtChecksKey = ?', [$request->PmtChecksKey]);
+            
+            foreach ($debtorPaymentImages as $key => $value) {       
+                $payment_images['fullname'] = $value->Path . "\\" . $value->FileName;
+                $payment_images['basename'] = $value->FileName;
+                
+                $sourcePath = $value->Path . "\\" . $value->FileName;   
+                
+                if (!File::exists(public_path('payment_images'))) {
+                    File::makeDirectory(public_path('payment_images'), 0755, true);
+                }
+
+                $destinationPath = public_path('payment_images/' . $value->FileName);
+
+                $extension = File::extension($destinationPath);
+                if ($extension == 'tif' || $extension == 'tiff') {
+                    // Image::load($sourcePath)
+                    // ->format('jpg')
+                    // ->format($destinationPath);
+                    // $destinationPath = public_path('payment_images/' . $value->FileName) . '.png';
+                }
+                
+                if (File::exists($sourcePath)) {
+                    File::copy($sourcePath, $destinationPath);                                                    
+                } else {
+                    echo 'Source file does not exist.';
+                }                    
+            }  
+          
+            return response()->json([
+                'debtorPaymentImages' => $debtorPaymentImages,
+            ]);            
+
+        } catch(ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch(Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
 
     /**

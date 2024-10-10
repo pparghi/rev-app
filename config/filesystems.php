@@ -44,6 +44,10 @@ return [
             'throw' => false,
         ],
 
+        'payment_images' => [
+            'root' => storage_path('app/public/payment_images'),
+        ],
+
         'virtual' => [
             'driver' => 'local',
             'root' => '//baron.finance/Shares/Systems/Cadence/Documents', 

@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\MiscDataListController;
 use App\Http\Middleware\CorsMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -20,6 +21,7 @@ Route::get('/user', function (Request $request) {
 Route::get('debtors', [DebtorsController::class, 'index']);
 Route::get('debtorContactsData', [DebtorsController::class, 'debtorContacts']);
 Route::get('debtorPaymentsData', [DebtorsController::class, 'debtorPayments']);
+Route::get('debtorPaymentsImages', [DebtorsController::class, 'debtorPaymentsImages']);
 Route::post('updateDebtorCreditLimit', [DebtorsController::class, 'updateCreditLimit']);
 Route::post('updateDebtorAccountStatus', [DebtorsController::class, 'updateAccountStatus']);
 Route::resource('memberDebtors', MemberDebtorsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
@@ -32,3 +34,12 @@ Route::get('documentsList', [DebtorDocumentsController ::class, 'index']);
 Route::post('debtorMasterAddDocument', [DebtorDocumentsController ::class, 'uploadDebtorDocuments']);
 Route::get('memberMasterDebtor', [MemberMasterDebtorController ::class, 'index']);
 Route::get('MiscDataList', [MiscDataListController ::class, 'index']);
+Route::get('/paymentsFiles/{filename}', function ($filename) {
+    $path = public_path('payment_images/' . $filename);
+
+    if (!File::exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path); 
+});
