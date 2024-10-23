@@ -35,8 +35,9 @@ class DebtorsController extends Controller
             $search = $request->input('search') ? $request->input('search') : '';
             $sortBy = $request->input('sortBy', 'Debtor');
             $sortOrder = $request->input('sortOrder', 'ASC');
+            $filterByBalance = $request->input('filterByBalance');
 
-            $data = DB::select('web.SP_DebtorMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?', [$offset, $perPage, $search, $sortBy, $sortOrder]);
+            $data = DB::select('web.SP_DebtorMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?,@filterByBalance = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance]);
 
             $DebtoNoBuyDisputeList = DB::select('Web.SP_DebtoNoBuyDisputeList');
 

@@ -17,10 +17,14 @@ class MasterClientsController extends Controller
         $perPage = $request->get('per_page', 25);
         $offset = ($page * $perPage)/$perPage;
         $search = $request->input('search') ? $request->input('search') : '';
-        $sortBy = $request->input('sortBy', 'Debtor');
-        $sortOrder = $request->input('sortOrder', 'ASC');
+        $sortBy = $request->input('sortBy') ? $request->input('sortBy') : '';
+        $sortOrder = $request->input('sortOrder');
+        $filterByBalance = $request->input('filterByBalance');
+        $filterByGroup = $request->input('filterByGroup');
 
-        $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?', [$offset, $perPage, $search, $sortBy, $sortOrder]);
+        $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?, @filterByBalance = ?, @GroupValue = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance, $filterByGroup]);
+
+        $clientGroupLevelList = DB::select('web.SP_ClientGroupLevelList');
 
         $total = DB::select('web.SP_CountClientMasterDetails');
         
@@ -28,7 +32,8 @@ class MasterClientsController extends Controller
             'data' => $data,
             'total' => $total[0],
             'per_page' => $perPage,
-            'current_page' => $page
+            'current_page' => $page,
+            'clientGroupLevelList' => $clientGroupLevelList
         ]);
     }
 
