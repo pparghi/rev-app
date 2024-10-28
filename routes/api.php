@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ClientsDebtorController;
 use App\Http\Controllers\Api\ClientsInvoicesController;
 use App\Http\Controllers\Api\DebtorDocumentsController;
 use App\Http\Controllers\Api\DebtorsController;
+use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\MemberDebtorsController;
 use App\Http\Controllers\Api\MasterClientsController;
 use App\Http\Controllers\Api\MemberClientsController;
@@ -34,6 +35,8 @@ Route::get('documentsList', [DebtorDocumentsController ::class, 'index']);
 Route::post('debtorMasterAddDocument', [DebtorDocumentsController ::class, 'uploadDebtorDocuments']);
 Route::get('memberMasterDebtor', [MemberMasterDebtorController ::class, 'index']);
 Route::get('MiscDataList', [MiscDataListController ::class, 'index']);
+Route::get('clientGroupLevelList', [MasterClientsController ::class, 'clientGroupLevelList']);
+Route::get('login', [LoginController ::class, 'index']);
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
 

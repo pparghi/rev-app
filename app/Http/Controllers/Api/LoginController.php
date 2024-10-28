@@ -6,15 +6,22 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class LoginController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $email = $request->input('mail');
+
+        $data = DB::select('web.SP_UserInfo @email = ?', [$email]);
+        
+        return response()->json([
+            'data' => $data
+        ]);
     }
 
     /**

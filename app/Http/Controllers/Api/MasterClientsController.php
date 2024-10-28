@@ -22,9 +22,7 @@ class MasterClientsController extends Controller
         $filterByBalance = $request->input('filterByBalance');
         $filterByGroup = $request->input('filterByGroup');
 
-        $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?, @filterByBalance = ?, @GroupValue = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance, $filterByGroup]);
-
-        $clientGroupLevelList = DB::select('web.SP_ClientGroupLevelList');
+        $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?, @filterByBalance = ?, @GroupValue = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance, $filterByGroup]);        
 
         $total = DB::select('web.SP_CountClientMasterDetails');
         
@@ -32,7 +30,14 @@ class MasterClientsController extends Controller
             'data' => $data,
             'total' => $total[0],
             'per_page' => $perPage,
-            'current_page' => $page,
+            'current_page' => $page            
+        ]);
+    }
+
+    public function clientGroupLevelList(Request $request){
+        $clientGroupLevelList = DB::select('web.SP_ClientGroupLevelList');
+        
+        return response()->json([
             'clientGroupLevelList' => $clientGroupLevelList
         ]);
     }
