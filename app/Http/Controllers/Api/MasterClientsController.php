@@ -20,9 +20,9 @@ class MasterClientsController extends Controller
         $sortBy = $request->input('sortBy') ? $request->input('sortBy') : '';
         $sortOrder = $request->input('sortOrder');
         $filterByBalance = $request->input('filterByBalance');
-        $filterByGroup = $request->input('filterByGroup');
+        $filterByGroupValue = $request->input('filterByGroupValue');
 
-        $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?, @filterByBalance = ?, @GroupValue = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance, $filterByGroup]);        
+        $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?, @filterByBalance = ?, @GroupCode = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance, $filterByGroupValue]);        
 
         $total = DB::select('web.SP_CountClientMasterDetails');
         
@@ -39,6 +39,22 @@ class MasterClientsController extends Controller
         
         return response()->json([
             'clientGroupLevelList' => $clientGroupLevelList
+        ]);
+    }
+
+    public function clientGroupList(Request $request){
+        $clientGroupList = DB::select('web.SP_ClientGroupList');
+        
+        return response()->json([
+            'clientGroupList' => $clientGroupList
+        ]);
+    }
+
+    public function clientGroupValueList(Request $request){
+        $clientGroupValueList = DB::select('web.SP_ClientGroupValueList @GroupCodeKey = ?', [$request->GroupCodeKey]);
+        
+        return response()->json([
+            'clientGroupValueList' => $clientGroupValueList
         ]);
     }
 

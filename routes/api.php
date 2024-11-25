@@ -36,6 +36,8 @@ Route::post('debtorMasterAddDocument', [DebtorDocumentsController ::class, 'uplo
 Route::get('memberMasterDebtor', [MemberMasterDebtorController ::class, 'index']);
 Route::get('MiscDataList', [MiscDataListController ::class, 'index']);
 Route::get('clientGroupLevelList', [MasterClientsController ::class, 'clientGroupLevelList']);
+Route::get('clientGroupList', [MasterClientsController ::class, 'clientGroupList']);
+Route::get('clientGroupValueList', [MasterClientsController ::class, 'clientGroupValueList']);
 Route::get('login', [LoginController ::class, 'index']);
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
