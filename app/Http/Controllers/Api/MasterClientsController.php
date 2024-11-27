@@ -20,9 +20,10 @@ class MasterClientsController extends Controller
         $sortBy = $request->input('sortBy') ? $request->input('sortBy') : '';
         $sortOrder = $request->input('sortOrder');
         $filterByBalance = $request->input('filterByBalance');
+        $filterByGroup = $request->input('filterByGroup');
         $filterByGroupValue = $request->input('filterByGroupValue');
 
-        $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?, @filterByBalance = ?, @GroupCode = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance, $filterByGroupValue]);        
+        $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?,  @filterByBalance = ?, @GroupCode = ?, @GroupValue = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance, $filterByGroup, $filterByGroupValue]);        
 
         $total = DB::select('web.SP_CountClientMasterDetails');
         
