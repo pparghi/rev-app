@@ -19,6 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        putenv('MAGICK_HOME=C:/PROGRA~1/PHP/8.1/ext');
+        //
     }
 }
