@@ -97,6 +97,7 @@ class DebtorsController extends Controller
 
                 $extension = File::extension($destinationPath);
                 if ($extension == 'tif' || $extension == 'tiff') {
+                    $images = new Imagick($destinationPath);
                     // Image::load($sourcePath)
                     // ->format('jpg')
                     // ->format($destinationPath);
