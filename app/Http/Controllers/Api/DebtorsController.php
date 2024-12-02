@@ -11,8 +11,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
-use Spatie\Image\Image;
-
+use Intervention\Image\ImageManagerStatic as Image;
 
 class DebtorsController extends Controller
 {
@@ -96,7 +95,24 @@ class DebtorsController extends Controller
                 $destinationPath = public_path('payment_images/' . $value->FileName);
 
                 $extension = File::extension($destinationPath);
+                // if (!extension_loaded('imagick')) {
+                //     phpinfo();
+                //     throw new Exception('imagick not loaded');
+                //     exit;
+                // } else {
+                //     echo 'Imagick Version: ' . phpversion('imagick') . "\n";
+                //    // echo 'ImageMagick Version: ' . \Imagick::getVersion()['versionString'] . "\n";
+                //     exit;
+                // }
+//C:\Program Files\ImageMagick-7.1.1-Q16-HDRI
                 if ($extension == 'tif' || $extension == 'tiff') {
+
+                    $tiff = $request->file('tiff'); 
+                    $pdf = $tiff->storeAs('pdfs', 'converted.pdf'); 
+                    $image = Image::make($tiff); 
+                    $image->save($pdf);
+                   // $image = new \Imagick();
+                    
                     // Image::load($sourcePath)
                     // ->format('jpg')
                     // ->format($destinationPath);

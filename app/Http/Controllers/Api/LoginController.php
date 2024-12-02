@@ -109,4 +109,12 @@ class LoginController extends Controller
            return response()->json(['error' => 'Decryption failed'], 500);
        }
    }
+
+   public function exchangeRatesByMonth(){
+        $exchangeRatesByMonth = DB::select('Web.SP_ExchangeRatesByMonth');
+        
+        return response()->json([
+            'exchangeRatesByMonth' => $exchangeRatesByMonth
+        ]);
+   }
 }

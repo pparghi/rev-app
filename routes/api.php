@@ -31,14 +31,15 @@ Route::resource('clientsinvoices', ClientsInvoicesController::class)->except(['c
 Route::resource('masterClients', MasterClientsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('memberClients', MemberClientsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('ClientsDebtors', ClientsDebtorController ::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
-Route::get('documentsList', [DebtorDocumentsController ::class, 'index']);
-Route::post('debtorMasterAddDocument', [DebtorDocumentsController ::class, 'uploadDebtorDocuments']);
-Route::get('memberMasterDebtor', [MemberMasterDebtorController ::class, 'index']);
-Route::get('MiscDataList', [MiscDataListController ::class, 'index']);
-Route::get('clientGroupLevelList', [MasterClientsController ::class, 'clientGroupLevelList']);
-Route::get('clientGroupList', [MasterClientsController ::class, 'clientGroupList']);
-Route::get('clientGroupValueList', [MasterClientsController ::class, 'clientGroupValueList']);
-Route::get('login', [LoginController ::class, 'index']);
+Route::get('documentsList', [DebtorDocumentsController::class, 'index']);
+Route::post('debtorMasterAddDocument', [DebtorDocumentsController::class, 'uploadDebtorDocuments']);
+Route::get('memberMasterDebtor', [MemberMasterDebtorController::class, 'index']);
+Route::get('MiscDataList', [MiscDataListController::class, 'index']);
+Route::get('clientGroupLevelList', [MasterClientsController::class, 'clientGroupLevelList']);
+Route::get('clientGroupList', [MasterClientsController::class, 'clientGroupList']);
+Route::get('clientGroupValueList', [MasterClientsController::class, 'clientGroupValueList']);
+Route::get('login', [LoginController::class, 'index']);
+Route::get('exchangeRatesByMonth', [LoginController::class, 'exchangeRatesByMonth']);
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
 
