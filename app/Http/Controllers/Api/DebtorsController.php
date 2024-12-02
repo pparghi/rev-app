@@ -95,7 +95,7 @@ class DebtorsController extends Controller
                 $destinationPath = public_path('payment_images/' . $value->FileName);
 
                 $extension = File::extension($destinationPath);
-                // if (!extension_loaded('imagick')) {
+                // if (!extension_loaded('imagick')) {  
                 //     phpinfo();
                 //     throw new Exception('imagick not loaded');
                 //     exit;
@@ -109,8 +109,8 @@ class DebtorsController extends Controller
 
                     $tiff = $request->file('tiff'); 
                     $pdf = $tiff->storeAs('pdfs', 'converted.pdf'); 
-                    $image = Image::make($tiff); 
-                    $image->save($pdf);
+                    // $image = Image::make($tiff); 
+                    // $image->save($pdf);
                    // $image = new \Imagick();
                     
                     // Image::load($sourcePath)
