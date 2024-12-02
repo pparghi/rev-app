@@ -107,8 +107,8 @@ class DebtorsController extends Controller
 //C:\Program Files\ImageMagick-7.1.1-Q16-HDRI
                 if ($extension == 'tif' || $extension == 'tiff') {
 
-                    $tiff = $request->file('tiff'); 
-                    $pdf = $tiff->storeAs('pdfs', 'converted.pdf'); 
+                    // $tiff = $request->file('tiff'); 
+                    // $pdf = $tiff->storeAs('pdfs', 'converted.pdf'); 
                     // $image = Image::make($tiff); 
                     // $image->save($pdf);
                    // $image = new \Imagick();
