@@ -39,7 +39,7 @@ Route::get('clientGroupLevelList', [MasterClientsController::class, 'clientGroup
 Route::get('clientGroupList', [MasterClientsController::class, 'clientGroupList']);
 Route::get('clientGroupValueList', [MasterClientsController::class, 'clientGroupValueList']);
 Route::get('login', [LoginController::class, 'index']);
-Route::get('exchangeRatesByMonth', [LoginController::class, 'exchangeRatesByMonth']);
+Route::get('exchangeRatesByMonth', [LoginController::class, 'exchangeRatesByMonth']); 
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
 

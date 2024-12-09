@@ -23,6 +23,13 @@ class LoginController extends Controller
             'data' => $data
         ]);
     }
+    public function exchangeRatesByMonth(){
+        $exchangeRatesByMonth = DB::select('Web.SP_ExchangeRatesByMonth');
+        
+        return response()->json([
+            'exchangeRatesByMonth' => $exchangeRatesByMonth
+        ]);
+   }
 
     /**
      * Show the form for creating a new resource.
@@ -108,13 +115,5 @@ class LoginController extends Controller
        } catch (Exception $e) {
            return response()->json(['error' => 'Decryption failed'], 500);
        }
-   }
-
-   public function exchangeRatesByMonth(){
-        $exchangeRatesByMonth = DB::select('Web.SP_ExchangeRatesByMonth');
-        
-        return response()->json([
-            'exchangeRatesByMonth' => $exchangeRatesByMonth
-        ]);
    }
 }

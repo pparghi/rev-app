@@ -32,8 +32,8 @@ class DebtorsController extends Controller
             $perPage = $request->get('per_page', 25);
             $offset = ($page * $perPage)/$perPage;
             $search = $request->input('search') ? $request->input('search') : '';
-            $sortBy = $request->input('sortBy', 'Debtor');
-            $sortOrder = $request->input('sortOrder', 'ASC');
+            $sortBy = $request->input('sortBy', 'Balance');
+            $sortOrder = $request->input('sortOrder', 'DESC');
             $filterByBalance = $request->input('filterByBalance');
 
             $data = DB::select('web.SP_DebtorMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?,@filterByBalance = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance]);
@@ -82,49 +82,49 @@ class DebtorsController extends Controller
             $payment_images = [];           
             $debtorPaymentImages = DB::select('Web.SP_DebtorPaymentsImages @PmtChecksKey = ?', [$request->PmtChecksKey]);
             
-            foreach ($debtorPaymentImages as $key => $value) {       
-                $payment_images['fullname'] = $value->Path . "\\" . $value->FileName;
-                $payment_images['basename'] = $value->FileName;
+//             foreach ($debtorPaymentImages as $key => $value) {       
+//                 $payment_images['fullname'] = $value->Path . "\\" . $value->FileName;
+//                 $payment_images['basename'] = $value->FileName;
                 
-                $sourcePath = $value->Path . "\\" . $value->FileName;   
+//                 $sourcePath = $value->Path . "\\" . $value->FileName;   
                 
-                if (!File::exists(public_path('payment_images'))) {
-                    File::makeDirectory(public_path('payment_images'), 0755, true);
-                }
+//                 if (!File::exists(public_path('payment_images'))) {
+//                     File::makeDirectory(public_path('payment_images'), 0755, true);
+//                 }
 
-                $destinationPath = public_path('payment_images/' . $value->FileName);
+//                 $destinationPath = public_path('payment_images/' . $value->FileName);
 
-                $extension = File::extension($destinationPath);
-                // if (!extension_loaded('imagick')) {  
-                //     phpinfo();
-                //     throw new Exception('imagick not loaded');
-                //     exit;
-                // } else {
-                //     echo 'Imagick Version: ' . phpversion('imagick') . "\n";
-                //    // echo 'ImageMagick Version: ' . \Imagick::getVersion()['versionString'] . "\n";
-                //     exit;
-                // }
-//C:\Program Files\ImageMagick-7.1.1-Q16-HDRI
-                if ($extension == 'tif' || $extension == 'tiff') {
+//                 $extension = File::extension($destinationPath);
+//                 // if (!extension_loaded('imagick')) {  
+//                 //     phpinfo();
+//                 //     throw new Exception('imagick not loaded');
+//                 //     exit;
+//                 // } else {
+//                 //     echo 'Imagick Version: ' . phpversion('imagick') . "\n";
+//                 //    // echo 'ImageMagick Version: ' . \Imagick::getVersion()['versionString'] . "\n";
+//                 //     exit;
+//                 // }
+// //C:\Program Files\ImageMagick-7.1.1-Q16-HDRI
+//                 if ($extension == 'tif' || $extension == 'tiff') {
 
-                    // $tiff = $request->file('tiff'); 
-                    // $pdf = $tiff->storeAs('pdfs', 'converted.pdf'); 
-                    // $image = Image::make($tiff); 
-                    // $image->save($pdf);
-                   // $image = new \Imagick();
+//                     // $tiff = $request->file('tiff'); 
+//                     // $pdf = $tiff->storeAs('pdfs', 'converted.pdf'); 
+//                     // $image = Image::make($tiff); 
+//                     // $image->save($pdf);
+//                    // $image = new \Imagick();
                     
-                    // Image::load($sourcePath)
-                    // ->format('jpg')
-                    // ->format($destinationPath);
-                    // $destinationPath = public_path('payment_images/' . $value->FileName) . '.png';
-                }
+//                     // Image::load($sourcePath)
+//                     // ->format('jpg')
+//                     // ->format($destinationPath);
+//                     // $destinationPath = public_path('payment_images/' . $value->FileName) . '.png';
+//                 }
                 
-                if (File::exists($sourcePath)) {
-                    File::copy($sourcePath, $destinationPath);                                                    
-                } else {
-                    echo 'Source file does not exist.';
-                }                    
-            }  
+//                 if (File::exists($sourcePath)) {
+//                     File::copy($sourcePath, $destinationPath);                                                    
+//                 } else {
+//                     echo 'Source file does not exist.';
+//                 }                    
+//             }  
           
             return response()->json([
                 'debtorPaymentImages' => $debtorPaymentImages,
