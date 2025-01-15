@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\MasterClientsController;
 use App\Http\Controllers\Api\MemberClientsController;
 use App\Http\Controllers\Api\MemberMasterDebtorController;
 use App\Http\Controllers\Api\MiscDataListController;
+use App\Http\Controllers\Api\RiskMonitoringController;
 use App\Http\Middleware\CorsMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,11 +36,16 @@ Route::get('documentsList', [DebtorDocumentsController::class, 'index']);
 Route::post('debtorMasterAddDocument', [DebtorDocumentsController::class, 'uploadDebtorDocuments']);
 Route::get('memberMasterDebtor', [MemberMasterDebtorController::class, 'index']);
 Route::get('MiscDataList', [MiscDataListController::class, 'index']);
-Route::get('clientGroupLevelList', [MasterClientsController::class, 'clientGroupLevelList']);
+// Route::get('clientGroupLevelList', [MasterClientsController::class, 'clientGroupLevelList']);
 Route::get('clientGroupList', [MasterClientsController::class, 'clientGroupList']);
 Route::get('clientGroupValueList', [MasterClientsController::class, 'clientGroupValueList']);
 Route::get('login', [LoginController::class, 'index']);
 Route::get('exchangeRatesByMonth', [LoginController::class, 'exchangeRatesByMonth']); 
+Route::get('riskMonitoring', [RiskMonitoringController::class, 'index']); 
+Route::get('clientGroupLevelList', [RiskMonitoringController::class, 'clientGroupLevelList']); 
+Route::get('CRMList', [RiskMonitoringController::class, 'CRMList']); 
+Route::get('officeList', [RiskMonitoringController::class, 'officeList']); 
+Route::get('DDCreatedBy', [RiskMonitoringController::class, 'DDCreatedBy']); 
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
 

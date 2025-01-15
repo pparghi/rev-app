@@ -6,33 +6,33 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class MasterClientsController extends Controller
+class RiskMonitoringController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {        
+    {
         $page = $request->get('page', 1);
         $perPage = $request->get('per_page', 25);
         $offset = ($page * $perPage)/$perPage;
+        $sortBy = $request->input('sortBy', '');
+        $sortOrder = $request->input('sortOrder', '');
+        $DueDateFrom = '12/22/2024';
+        $DueDateTo = '12/28/2024';
+        $Inactive = $request->isActive;
         $search = $request->input('search') ? $request->input('search') : '';
-        $sortBy = $request->input('sortBy', 'Balance');
-        $sortOrder = $request->input('sortOrder', 'DESC');
-        $filterByBalance = $request->input('filterByBalance');
-        $filterByGroup = $request->input('filterByGroup');
-        $filterByGroupValue = $request->input('filterByGroupValue');
-
-        $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?,  @filterByBalance = ?, @GroupCode = ?, @GroupValue = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance, $filterByGroup, $filterByGroupValue]);        
-
-        $total = DB::select('web.SP_CountClientMasterDetails');
+        $Fuel = $request->isFuel;        
+        $DDCreatedBy = $request->DDCreatedBy ? $request->DDCreatedBy : '';
+        $level = $request->level ? $request->level : '';
+        $office = $request->office ? $request->office : '';
+        $crm = $request->crm ? $request->crm : '';        
+        
+        $data = DB::select('Web.ClientsCreditReviewFilters @OFFSET = ?, @LIMIT = ?, @sortColumn = ?, @sortDirection = ?, @DueDateFrom = ?,  @DueDateTo = ?, @Inactive = ?, @Name = ?, @Office = ?, @AcctExec = ?, @Level = ?, @Fuel = ?, @CreatedBy = ?',  [$offset, $perPage, $sortBy, $sortOrder, $DueDateFrom, $DueDateTo, $Inactive,  $search, $office, $crm, $level, $Fuel, $DDCreatedBy]);
         
         return response()->json([
             'data' => $data,
-            'total' => $total[0],
-            'per_page' => $perPage,
-            'current_page' => $page            
-        ]);
+        ]); 
     }
 
     public function clientGroupLevelList(Request $request){
@@ -43,19 +43,26 @@ class MasterClientsController extends Controller
         ]);
     }
 
-    public function clientGroupList(Request $request){
-        $clientGroupList = DB::select('web.SP_ClientGroupList');
+    public function CRMList(Request $request){
+        $CRMList = DB::select('web.SP_CRMsList');
         
         return response()->json([
-            'clientGroupList' => $clientGroupList
+            'CRMList' => $CRMList
+        ]);
+    }
+    public function officeList(Request $request){
+        $officeList = DB::select('web.SP_officeList');
+        
+        return response()->json([
+            'officeList' => $officeList
         ]);
     }
 
-    public function clientGroupValueList(Request $request){
-        $clientGroupValueList = DB::select('web.SP_ClientGroupValueList @GroupCodeKey = ?', [$request->GroupCodeKey]);
+    public function DDCreatedBy(Request $request){
+        $DDCreatedBy = DB::select('web.SP_DDCreatedBy');
         
         return response()->json([
-            'clientGroupValueList' => $clientGroupValueList
+            'DDCreatedBy' => $DDCreatedBy
         ]);
     }
 
