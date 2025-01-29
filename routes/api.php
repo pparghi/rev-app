@@ -46,6 +46,10 @@ Route::get('clientGroupLevelList', [RiskMonitoringController::class, 'clientGrou
 Route::get('CRMList', [RiskMonitoringController::class, 'CRMList']); 
 Route::get('officeList', [RiskMonitoringController::class, 'officeList']); 
 Route::get('DDCreatedBy', [RiskMonitoringController::class, 'DDCreatedBy']); 
+Route::get('ClientDetails', [RiskMonitoringController::class, 'ClientDetails']); 
+Route::get('ClientContactsDetails', [RiskMonitoringController::class, 'ClientContactsDetails']); 
+Route::get('MonitoringCategories', [RiskMonitoringController::class, 'MonitoringCategories']); 
+Route::get('MonitoringNotes', [RiskMonitoringController::class, 'MonitoringNotes']); 
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
 

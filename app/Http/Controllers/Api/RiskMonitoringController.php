@@ -18,8 +18,8 @@ class RiskMonitoringController extends Controller
         $offset = ($page * $perPage)/$perPage;
         $sortBy = $request->input('sortBy', '');
         $sortOrder = $request->input('sortOrder', '');
-        $DueDateFrom = '12/22/2024';
-        $DueDateTo = '12/28/2024';
+        $DueDateFrom = $request->input('dueDateFrom', '');
+        $DueDateTo = $request->input('dueDateTo', '');
         $Inactive = $request->isActive;
         $search = $request->input('search') ? $request->input('search') : '';
         $Fuel = $request->isFuel;        
@@ -63,6 +63,48 @@ class RiskMonitoringController extends Controller
         
         return response()->json([
             'DDCreatedBy' => $DDCreatedBy
+        ]);
+    }
+
+    public function ClientDetails(Request $request){
+        $ClientKey = $request->input('ClientKey');
+        $ClientDetails = DB::select('Web.SP_ClientDetails @ClientKey = ?', [$ClientKey]);
+        
+        return response()->json([
+            'ClientDetails' => $ClientDetails
+        ]);
+    }
+    
+    public function ClientContactsDetails(Request $request){
+        $ClientKey = $request->input('ClientKey');
+        $ClientContactsDetails = DB::select('Web.SP_ClientContactsDetails @ClientKey = ?', [$ClientKey]);
+        $ClientFuelOrNot = DB::select('Web.SP_ClientFuelOrNot @ClientKey = ?', [$ClientKey]);
+        
+        return response()->json([
+            'ClientContactsDetails' => $ClientContactsDetails,
+            'ClientFuelOrNot' => $ClientFuelOrNot
+        ]);
+    }
+
+    public function MonitoringCategories(Request $request){        
+        $MonitoringCategories = DB::select('Web.SP_MonitoringCategories');
+        
+        foreach ($MonitoringCategories as $row) {
+            $categories = explode(";",$row->parameter_value);
+        }
+        
+        return response()->json([
+            'MonitoringCategories' => $categories
+        ]);
+    }
+
+    public function MonitoringNotes(Request $request){     
+        $ClientKey = $request->input('ClientKey');   
+        $Category = $request->input('Category') ? $request->input('Category') : '%';
+        $MonitoringNotes = DB::select('Web.SP_MonitoringNotes @ClientKey = ?, @Category = ?', [$ClientKey, $Category]);        
+        
+        return response()->json([
+            'MonitoringNotes' => $MonitoringNotes
         ]);
     }
 
