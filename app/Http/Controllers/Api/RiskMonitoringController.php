@@ -69,9 +69,11 @@ class RiskMonitoringController extends Controller
     public function ClientDetails(Request $request){
         $ClientKey = $request->input('ClientKey');
         $ClientDetails = DB::select('Web.SP_ClientDetails @ClientKey = ?', [$ClientKey]);
+        $LevelHistory = DB::select('Web.SP_LevelHistory @ClientKey = ?', [$ClientKey]);
         
         return response()->json([
-            'ClientDetails' => $ClientDetails
+            'ClientDetails' => $ClientDetails,
+            'LevelHistory' => $LevelHistory
         ]);
     }
     
