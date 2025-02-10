@@ -27,7 +27,7 @@ class DebtorsController extends Controller
         } else {
             $user = [];
         }
-        if(count($user) > 0){                     
+        // if(count($user) > 0){                     
             $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 25);
             $offset = ($page * $perPage)/$perPage;
@@ -51,18 +51,20 @@ class DebtorsController extends Controller
             ]);
 
             return $response;   
-        }else{
-            return response()->json(['message' => 'User not found'], 404);
-        }        
+        // }else{
+        //     return response()->json(['message' => 'User not found'], 404);
+        // }        
     }
 
     public function debtorContacts(Request $request)
     {      
 
         $debtorContactsData = DB::select('web.SP_InvoiceDebtorContactsDetails @Debtorkey = ?', [$request->DebtorKey]);
+        $debtorAudit = DB::select('web.SP_DebtorAudit @Debtorkey = ?', [$request->DebtorKey]);
         
         return response()->json([
             'debtorContactsData' => $debtorContactsData,
+            'debtorAudit' => $debtorAudit
         ]);
     }
 
@@ -173,23 +175,48 @@ class DebtorsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updateCreditLimit(Request $request)
-    {
+    // public function updateCreditLimit(Request $request)
+    // {
+    //     try {
+    //         DB::statement('web.SP_DebtorChangeTotalCreditLimit @DebtorKey = ?, @TotalCreditLimit = ?, @CredAppBy = ?', [$request->DebtorKey, $request->TotalCreditLimit, $request->CredAppBy]);
+    //     } catch(\Exception $e) {
+    //         return response()->json(['error' => 'Failed to update creditLimit', 'message' => $e->getMessage()], 500);
+    //     }
+    // }
+
+    // public function updateAccountStatus(Request $request)
+    // {
+    //     try {
+    //         DB::statement('web.SP_DebtorChangeNoBuyDispute @DebtorKey = ?, @NoBuyDisputeKey = ?, @CredAppBy = ?', [$request->DebtorKey, $request->NoBuyDisputeKey, $request->CredAppBy]);
+    //     } catch(\Exception $e) {
+    //         return response()->json(['error' => 'Failed to update creditLimit', 'message' => $e->getMessage()], 500);
+    //     }
+    // }
+    public function updateDebtorDetails(Request $request)
+    {               
+        $DebtorKey = $request->DebtorKey ? $request->DebtorKey : '';
+        $Debtor = $request->Debtor ? $request->Debtor : '';
+        $Duns = $request->Duns ? $request->Duns : '';
+        $Addr1 = $request->Addr1 ? $request->Addr1 : '';
+        $Addr2 = $request->Addr2 ? $request->Addr2 : '';
+        $Phone1 = $request->Phone1 ? $request->Phone1 : '';
+        $Phone2 = $request->Phone2 ? $request->Phone2 : '';
+        $City = $request->City ? $request->City : '';
+        $State = $request->State ? $request->State : '';
+        $TotalCreditLimit = $request->TotalCreditLimit ? $request->TotalCreditLimit : '';
+        $AIGLimit = $request->AIGLimit ? $request->AIGLimit : '';
+        $Terms = $request->Terms ? $request->Terms : '';
+        $MotorCarrNo = $request->MotorCarrNo ? $request->MotorCarrNo : '';
+        $CredAppBy = $request->CredAppBy ? $request->CredAppBy : '';
+
         try {
-            DB::statement('web.SP_DebtorChangeTotalCreditLimit @DebtorKey = ?, @TotalCreditLimit = ?, @CredAppBy = ?', [$request->DebtorKey, $request->TotalCreditLimit, $request->CredAppBy]);
+            // DB::statement('web.SP_DebtorChangeDetails @DebtorKey = ?, @Name = ?, @DbDunsNo = ?, @Addr1 = ?, @Addr2 = ?, @Phone1 = ?, @Phone2 = ?, @City = ?, @State = ?, @TotalCreditLimit = ?, @IndivCreditLimit = ?, @AIGLimit = ?, @Terms = ?, @MotorCarrNo = ?, @CredAppBy = ?', [$DebtorKey, $Debtor, $Duns, $Addr1, $Addr2, $Phone1, $Phone2, $City, $State, $TotalCreditLimit, $IndivCreditLimit, $AIGLimit, $Terms, $MotorCarrNo, $CredAppBy]);            
         } catch(\Exception $e) {
             return response()->json(['error' => 'Failed to update creditLimit', 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function updateAccountStatus(Request $request)
-    {
-        try {
-            DB::statement('web.SP_DebtorChangeNoBuyDispute @DebtorKey = ?, @NoBuyDisputeKey = ?, @CredAppBy = ?', [$request->DebtorKey, $request->NoBuyDisputeKey, $request->CredAppBy]);
-        } catch(\Exception $e) {
-            return response()->json(['error' => 'Failed to update creditLimit', 'message' => $e->getMessage()], 500);
-        }
-    }
+
 
     /**
      * Remove the specified resource from storage.

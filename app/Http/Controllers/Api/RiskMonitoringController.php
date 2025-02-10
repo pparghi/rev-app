@@ -16,8 +16,6 @@ class RiskMonitoringController extends Controller
         $page = $request->get('page', 1);
         $perPage = $request->get('per_page', 25);
         $offset = ($page * $perPage)/$perPage;
-        $sortBy = $request->input('sortBy', '');
-        $sortOrder = $request->input('sortOrder', '');
         $DueDateFrom = $request->input('dueDateFrom', '');
         $DueDateTo = $request->input('dueDateTo', '');
         $Inactive = $request->isActive;
@@ -27,6 +25,8 @@ class RiskMonitoringController extends Controller
         $level = $request->level ? $request->level : '';
         $office = $request->office ? $request->office : '';
         $crm = $request->crm ? $request->crm : '';        
+        $sortBy = $request->input('sortBy', 'NoteDueDate');
+        $sortOrder = $request->input('sortOrder', 'DESC');
         
         $data = DB::select('Web.ClientsCreditReviewFilters @OFFSET = ?, @LIMIT = ?, @sortColumn = ?, @sortDirection = ?, @DueDateFrom = ?,  @DueDateTo = ?, @Inactive = ?, @Name = ?, @Office = ?, @AcctExec = ?, @Level = ?, @Fuel = ?, @CreatedBy = ?',  [$offset, $perPage, $sortBy, $sortOrder, $DueDateFrom, $DueDateTo, $Inactive,  $search, $office, $crm, $level, $Fuel, $DDCreatedBy]);
         
@@ -36,7 +36,7 @@ class RiskMonitoringController extends Controller
     }
 
     public function clientGroupLevelList(Request $request){
-        $clientGroupLevelList = DB::select('web.SP_ClientGroupLevelList');
+        $clientGroupLevelList = DB::select('web.SP_ClientLevels');
         
         return response()->json([
             'clientGroupLevelList' => $clientGroupLevelList
@@ -70,10 +70,12 @@ class RiskMonitoringController extends Controller
         $ClientKey = $request->input('ClientKey');
         $ClientDetails = DB::select('Web.SP_ClientDetails @ClientKey = ?', [$ClientKey]);
         $LevelHistory = DB::select('Web.SP_LevelHistory @ClientKey = ?', [$ClientKey]);
+        $ClientLevelDetail = DB::select('Web.SP_ClientLevelDetail @ClientKey = ?', [$ClientKey]);
         
         return response()->json([
             'ClientDetails' => $ClientDetails,
-            'LevelHistory' => $LevelHistory
+            'LevelHistory' => $LevelHistory,
+            'ClientLevelDetail' => $ClientLevelDetail
         ]);
     }
     
@@ -148,6 +150,57 @@ class RiskMonitoringController extends Controller
     public function update(Request $request, string $id)
     {
         //
+    }
+    public function addNotesRisk(Request $request)
+    {
+        $ClientKey = $request->input('ClientKey');
+        $Category = $request->input('Category');
+        $Notes = $request->input('Notes');
+        $Currency = $request->input('Currency');
+        $Risk = $request->input('Risk');
+        $CreatedBy = $request->input('CreatedBy');
+        $DueDate = $request->input('DueDate');
+
+        try {
+            DB::statement('web.SP_ClientNotesAdd @ClientKey = ?, @Category = ?, @Notes = ?, @Currency = ?, @Risk = ?, @CreatedBy = ?, @DueDate = ?', [$ClientKey, $Category, $Notes, $Currency, $Risk, $CreatedBy, $DueDate]);
+        } catch(\Exception $e) {
+            return response()->json(['error' => 'Failed to add note', 'message' => $e->getMessage()], 500);
+        }
+    }
+    public function updateCRMRisk(Request $request)
+    {
+        $ClientKey = $request->input('ClientKey');
+        $crm = $request->input('CRM');
+        $Userkey = $request->input('UserKey');
+
+        try {
+            DB::statement('web.SP_ClientCRMUpdate @ClientKey = ?, @AcctExec = ?, @Userkey = ?', [$ClientKey, $crm, $Userkey]);
+        } catch(\Exception $e) {
+            return response()->json(['error' => 'Failed to update crm', 'message' => $e->getMessage()], 500);
+        }
+    }
+    public function updateLevelRisk(Request $request)
+    {
+        $ClientKey = $request->input('ClientKey');
+        $GroupValue = $request->input('GroupValue');
+        $Userkey = $request->input('UserKey');
+
+        try {
+            DB::statement('web.SP_ClientLevelsChange @ClientKey = ?, @GroupValue = ?, @Userkey = ?', [$ClientKey, $GroupValue, $Userkey]);
+        } catch(\Exception $e) {
+            return response()->json(['error' => 'Failed to update Level', 'message' => $e->getMessage()], 500);
+        }
+    }
+    public function updateCompleteStatusRisk(Request $request)
+    {
+        $ClientNoteKey = $request->input('ClientNoteKey');
+        $Complete = $request->input('Complete');        
+
+        try {
+            DB::statement('web.SP_ClientNotesCompleteStatus @ClientNoteKey = ?, @Complete = ?', [$ClientNoteKey, $Complete]);
+        } catch(\Exception $e) {
+            return response()->json(['error' => 'Failed to update Complete Status', 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**

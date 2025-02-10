@@ -24,8 +24,9 @@ Route::get('debtors', [DebtorsController::class, 'index']);
 Route::get('debtorContactsData', [DebtorsController::class, 'debtorContacts']);
 Route::get('debtorPaymentsData', [DebtorsController::class, 'debtorPayments']);
 Route::get('debtorPaymentsImages', [DebtorsController::class, 'debtorPaymentsImages']);
-Route::post('updateDebtorCreditLimit', [DebtorsController::class, 'updateCreditLimit']);
-Route::post('updateDebtorAccountStatus', [DebtorsController::class, 'updateAccountStatus']);
+Route::post('updateDebtorDetails', [DebtorsController::class, 'updateDebtorDetails']);
+// Route::post('updateDebtorCreditLimit', [DebtorsController::class, 'updateCreditLimit']);
+// Route::post('updateDebtorAccountStatus', [DebtorsController::class, 'updateAccountStatus']);
 Route::resource('memberDebtors', MemberDebtorsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('clients', ClientController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
 Route::resource('clientsinvoices', ClientsInvoicesController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
@@ -50,6 +51,10 @@ Route::get('ClientDetails', [RiskMonitoringController::class, 'ClientDetails']);
 Route::get('ClientContactsDetails', [RiskMonitoringController::class, 'ClientContactsDetails']); 
 Route::get('MonitoringCategories', [RiskMonitoringController::class, 'MonitoringCategories']); 
 Route::get('MonitoringNotes', [RiskMonitoringController::class, 'MonitoringNotes']); 
+Route::post('addNotesRisk', [RiskMonitoringController::class, 'addNotesRisk']);
+Route::post('updateCRMRisk', [RiskMonitoringController::class, 'updateCRMRisk']);
+Route::post('updateLevelRisk', [RiskMonitoringController::class, 'updateLevelRisk']);
+Route::post('updateCompleteStatusRisk', [RiskMonitoringController::class, 'updateCompleteStatusRisk']);
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
 
