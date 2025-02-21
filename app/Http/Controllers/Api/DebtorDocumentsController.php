@@ -92,7 +92,7 @@ class DebtorDocumentsController extends Controller
             $fileName = $file->getClientOriginalName();
             $cdt = date('Y-m-d H:i:s');
 
-            DB::statement('web.SP_DebtorMasterAddDocument @DebtorKey = ?, @Descr = ?, @FileName = ?, @DocCatKey = ?, @cdt = ?', [$request->DebtorKey, $request->Descr, $fileName, $request->DocCatKey, $cdt]);
+            DB::statement('web.SP_DebtorMasterAddDocument @DebtorKey = ?, @Descr = ?, @FileName = ?, @DocCatKey = ?', [$request->DebtorKey, $request->Descr, $fileName, $request->DocCatKey]);
 
             $docHdrKey = DB::select('web.SP_GetDocHdrKey @cdt = ?', [$cdt]);
 

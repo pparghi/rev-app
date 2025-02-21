@@ -61,10 +61,12 @@ class DebtorsController extends Controller
 
         $debtorContactsData = DB::select('web.SP_InvoiceDebtorContactsDetails @Debtorkey = ?', [$request->DebtorKey]);
         $debtorAudit = DB::select('web.SP_DebtorAudit @Debtorkey = ?', [$request->DebtorKey]);
+        $debtorStatementsDetails = DB::select('web.SP_DebtorStatementDetails @Debtorkey = ?', [$request->DebtorKey]);
         
         return response()->json([
             'debtorContactsData' => $debtorContactsData,
-            'debtorAudit' => $debtorAudit
+            'debtorAudit' => $debtorAudit,
+            'debtorStatementsDetails' => $debtorStatementsDetails
         ]);
     }
 
@@ -75,6 +77,15 @@ class DebtorsController extends Controller
         
         return response()->json([
             'debtorPaymentsData' => $debtorPaymentsData,
+        ]);
+    }
+    public function DebtorChecksSearch(Request $request)
+    {      
+
+        $payments = DB::select('web.SP_DebtorChecksSearch @Debtorkey = ?, @CheckNo = ?, @Amt = ?, @PostDateStart = ?, @PostDateEnd = ?, @LastPayments = ?', [$request->DebtorKey, $request->CheckNo, $request->Amt, $request->PostDateStart, $request->PostDateEnd, $request->LastPayments]);
+        
+        return response()->json([
+            'payments' => $payments
         ]);
     }
 
@@ -194,25 +205,38 @@ class DebtorsController extends Controller
     // }
     public function updateDebtorDetails(Request $request)
     {               
-        $DebtorKey = $request->DebtorKey ? $request->DebtorKey : '';
-        $Debtor = $request->Debtor ? $request->Debtor : '';
-        $Duns = $request->Duns ? $request->Duns : '';
-        $Addr1 = $request->Addr1 ? $request->Addr1 : '';
-        $Addr2 = $request->Addr2 ? $request->Addr2 : '';
-        $Phone1 = $request->Phone1 ? $request->Phone1 : '';
-        $Phone2 = $request->Phone2 ? $request->Phone2 : '';
-        $City = $request->City ? $request->City : '';
-        $State = $request->State ? $request->State : '';
-        $TotalCreditLimit = $request->TotalCreditLimit ? $request->TotalCreditLimit : '';
-        $AIGLimit = $request->AIGLimit ? $request->AIGLimit : '';
-        $Terms = $request->Terms ? $request->Terms : '';
-        $MotorCarrNo = $request->MotorCarrNo ? $request->MotorCarrNo : '';
-        $CredAppBy = $request->CredAppBy ? $request->CredAppBy : '';
-
         try {
-            // DB::statement('web.SP_DebtorChangeDetails @DebtorKey = ?, @Name = ?, @DbDunsNo = ?, @Addr1 = ?, @Addr2 = ?, @Phone1 = ?, @Phone2 = ?, @City = ?, @State = ?, @TotalCreditLimit = ?, @IndivCreditLimit = ?, @AIGLimit = ?, @Terms = ?, @MotorCarrNo = ?, @CredAppBy = ?', [$DebtorKey, $Debtor, $Duns, $Addr1, $Addr2, $Phone1, $Phone2, $City, $State, $TotalCreditLimit, $IndivCreditLimit, $AIGLimit, $Terms, $MotorCarrNo, $CredAppBy]);            
-        } catch(\Exception $e) {
-            return response()->json(['error' => 'Failed to update creditLimit', 'message' => $e->getMessage()], 500);
+            $DebtorKey = $request->DebtorKey ? $request->DebtorKey : '';
+            $Debtor = $request->Debtor ? $request->Debtor : '';
+            $Duns = $request->Duns ? $request->Duns : '';
+            $Addr1 = $request->Addr1 ? $request->Addr1 : '';
+            $Addr2 = $request->Addr2 ? $request->Addr2 : '';
+            $Phone1 = $request->Phone1 ? $request->Phone1 : '';
+            $Phone2 = $request->Phone2 ? $request->Phone2 : '';
+            $City = $request->City ? $request->City : '';
+            $State = $request->State ? $request->State : '';
+            $TotalCreditLimit = $request->TotalCreditLimit ? $request->TotalCreditLimit : '';
+            $IndivCreditLimit = $request->IndivCreditLimit ? $request->IndivCreditLimit : '';
+            $AIGLimit = $request->AIGLimit ? $request->AIGLimit : '';
+            $Terms = $request->Terms ? $request->Terms : '';
+            $MotorCarrNo = $request->MotorCarrNo ? $request->MotorCarrNo : '';
+            $CredAppBy = $request->CredAppBy ? $request->CredAppBy : '';
+            $Email = $request->Email ? $request->Email : '';
+            $RateDate = $request->RateDate ? $request->RateDate : '';
+            $CredExpireMos = $request->CredExpireMos ? $request->CredExpireMos : '';
+            $Notes = $request->Notes ? $request->Notes : '';
+            $CredNote = $request->CredNote ? $request->CredNote : '';
+            $Warning = $request->Warning ? $request->Warning : '';
+            $DotNo = $request->DotNo ? $request->DotNo : '';
+
+            DB::statement('web.SP_DebtorChangeDetails @DebtorKey = ?, @Name = ?, @DbDunsNo = ?, @Addr1 = ?, @Addr2 = ?, @Phone1 = ?, @Phone2 = ?, @City = ?, @State = ?, @TotalCreditLimit = ?, @IndivCreditLimit = ?, @AIGLimit = ?, @Terms = ?, @MotorCarrNo = ?, @CredAppBy = ?, @Email = ?, @RateDate = ?, @CredExpireMos = ?, @Notes = ?, @CredNote = ?, @Warning = ?, @DotNo = ?', [$DebtorKey, $Debtor, $Duns, $Addr1, $Addr2, $Phone1, $Phone2, $City, $State, $TotalCreditLimit, $IndivCreditLimit, $AIGLimit, $Terms, $MotorCarrNo, $CredAppBy, $Email, $RateDate, $CredExpireMos, $Notes, $CredNote, $Warning, $DotNo]);            
+            return response()->json([
+                'message' => 'Debtor details changed successfully!',
+            ]);
+        } catch(ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch(Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
