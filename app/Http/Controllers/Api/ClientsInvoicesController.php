@@ -14,11 +14,23 @@ class ClientsInvoicesController extends Controller
     public function index(Request $request)
     {
         $ClientKey = $request->get('ClientKey');
+        $DebtorKey = $request->get('DebtorKey');
         
-        $invoices = DB::select('web.SP_DebtorMasterMemberClientsInvoices @ClientKey  = ?', [$ClientKey]);
+        $invoices = DB::select('web.SP_DebtorMasterMemberClientsInvoicesDebtor @ClientKey = ?, @DebtorKey = ?', [$ClientKey, $DebtorKey]);
         
         return response()->json([
             'invoices' => $invoices,
+        ]);
+    }
+
+    public function invoiceDetailNotes(Request $request)
+    {
+        $InvoiceKey = $request->get('InvoiceKey');
+        
+        $invoiceDetailNotes = DB::select('web.SP_InvoiceDetailNotes @InvoiceKey = ?', [$InvoiceKey]);
+        
+        return response()->json([
+            'invoiceDetailNotes' => $invoiceDetailNotes,
         ]);
     }
 

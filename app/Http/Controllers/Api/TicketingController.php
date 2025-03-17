@@ -12,13 +12,8 @@ class TicketingController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $page = $request->get('page', 1);
-        $perPage = $request->get('per_page', 25);
-        $offset = ($page * $perPage)/$perPage;        
+    {    
         $ClientNo = $request->input('ClientNo') ? $request->input('ClientNo') : '';    
-        $sortBy = $request->input('sortBy', 'NoteDueDate');
-        $sortOrder = $request->input('sortOrder', 'DESC');
         $StatusList = $request->StatusList ? $request->StatusList : '';
         $RequestDate = $request->RequestDate ? $request->RequestDate : '';
         

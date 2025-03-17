@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\MemberClientsController;
 use App\Http\Controllers\Api\MemberMasterDebtorController;
 use App\Http\Controllers\Api\MiscDataListController;
 use App\Http\Controllers\Api\RiskMonitoringController;
+use App\Http\Controllers\Api\TicketingController;
 use App\Http\Middleware\CorsMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -56,6 +57,8 @@ Route::post('addNotesRisk', [RiskMonitoringController::class, 'addNotesRisk']);
 Route::post('updateCRMRisk', [RiskMonitoringController::class, 'updateCRMRisk']);
 Route::post('updateLevelRisk', [RiskMonitoringController::class, 'updateLevelRisk']);
 Route::post('updateCompleteStatusRisk', [RiskMonitoringController::class, 'updateCompleteStatusRisk']);
+Route::get('creditRequests', [TicketingController::class, 'index']); 
+Route::get('invoiceDetailNotes', [ClientsInvoicesController::class, 'invoiceDetailNotes']); 
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
 
