@@ -59,6 +59,7 @@ Route::post('updateLevelRisk', [RiskMonitoringController::class, 'updateLevelRis
 Route::post('updateCompleteStatusRisk', [RiskMonitoringController::class, 'updateCompleteStatusRisk']);
 Route::get('creditRequests', [TicketingController::class, 'index']); 
 Route::get('invoiceDetailNotes', [ClientsInvoicesController::class, 'invoiceDetailNotes']); 
+Route::post('ClientNotesHide', [RiskMonitoringController::class, 'ClientNotesHide']);
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
 

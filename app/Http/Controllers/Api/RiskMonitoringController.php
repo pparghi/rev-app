@@ -105,7 +105,8 @@ class RiskMonitoringController extends Controller
     public function MonitoringNotes(Request $request){     
         $ClientKey = $request->input('ClientKey');   
         $Category = $request->input('Category') ? $request->input('Category') : '%';
-        $MonitoringNotes = DB::select('Web.SP_MonitoringNotes @ClientKey = ?, @Category = ?', [$ClientKey, $Category]);        
+        $Hidden = $request->input('Hidden') ? $request->input('Hidden') : '%';
+        $MonitoringNotes = DB::select('Web.SP_MonitoringNotes @ClientKey = ?, @Category = ?, @Hidden = ?', [$ClientKey, $Category, $Hidden]);        
         
         return response()->json([
             'MonitoringNotes' => $MonitoringNotes
@@ -200,6 +201,18 @@ class RiskMonitoringController extends Controller
             DB::statement('web.SP_ClientNotesCompleteStatus @ClientNoteKey = ?, @Complete = ?', [$ClientNoteKey, $Complete]);
         } catch(\Exception $e) {
             return response()->json(['error' => 'Failed to update Complete Status', 'message' => $e->getMessage()], 500);
+        }
+    }
+    public function ClientNotesHide(Request $request)
+    {
+        $ClientNoteKey = $request->input('ClientNoteKey');
+        $Userkey = $request->input('UserKey');
+        $Hide = $request->input('Hide');       
+
+        try {
+            DB::statement('web.SP_ClientNotesHide @ClientNoteKey = ?, @Userkey = ?, @Hide = ?', [$ClientNoteKey, $Userkey, $Hide]);
+        } catch(\Exception $e) {
+            return response()->json(['error' => 'Failed to hide note', 'message' => $e->getMessage()], 500);
         }
     }
 
