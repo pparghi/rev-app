@@ -17,12 +17,12 @@ class MasterClientsController extends Controller
         $perPage = $request->get('per_page', 25);
         $offset = ($page * $perPage)/$perPage;
         $search = $request->input('search') ? $request->input('search') : '';
-        $sortBy = $request->input('sortBy', 'Balance');
-        $sortOrder = $request->input('sortOrder', 'DESC');
-        $filterByBalance = $request->input('filterByBalance');
-        $filterByGroup = $request->input('filterByGroup');
-        $filterByGroupValue = $request->input('filterByGroupValue');
-        $crm = $request->input('filterByCRM');
+        $sortBy = $request->input('sortBy') ? $request->input('sortBy') : 'Balance';
+        $sortOrder = $request->input('sortOrder') ? $request->input('sortOrder') : 'DESC';
+        $filterByBalance = $request->input('filterByBalance') ? $request->input('filterByBalance') : '';
+        $filterByGroup = $request->input('filterByGroup') ? $request->input('filterByGroup') : '';
+        $filterByGroupValue = $request->input('filterByGroupValue') ? $request->input('filterByGroupValue') : '';
+        $crm = $request->input('filterByCRM') ? $request->input('filterByCRM') : '';
 
         $data = DB::select('web.SP_ClientMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?,  @filterByBalance = ?, @GroupCode = ?, @GroupValue = ?, @UserKey = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance, $filterByGroup, $filterByGroupValue, $crm]);        
 

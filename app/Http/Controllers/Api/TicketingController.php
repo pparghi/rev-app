@@ -14,7 +14,7 @@ class TicketingController extends Controller
     public function index(Request $request)
     {    
         $ClientNo = $request->input('ClientNo') ? $request->input('ClientNo') : '';    
-        $StatusList = $request->StatusList ? $request->StatusList : '';
+        $StatusList = $request->StatusList ? $request->StatusList : '0';
         $RequestDate = $request->RequestDate ? $request->RequestDate : '';
         
         $data = DB::select('Web.SP_CredRequestList @StatusList = ?, @RequestDate = ?, @ClientNo = ?',  [$StatusList, $RequestDate, $ClientNo]);
