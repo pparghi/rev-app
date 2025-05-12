@@ -249,4 +249,23 @@ class DebtorsController extends Controller
     {
         //
     }
+
+
+    /**
+     * Display list of debtor history/trend by month/year/quater and clients.
+     */
+    public function debtorHistoryTrend(Request $request)
+    {    
+        $DebtorKey = $request->DebtorKey ? $request->DebtorKey : '';    
+        $ClientNo = $request->ClientNo ? $request->ClientNo : '';
+        $Type = $request->Type ? $request->Type : 'M';
+        
+        $data = DB::select('Web.SP_DebtorHistoryTrend @DebtorKey = ?, @ClientNo = ?, @Type = ?', [$DebtorKey, $ClientNo, $Type]);
+        
+        return response()->json([
+            'data' => $data,
+        ]);
+    }
+
+
 }
