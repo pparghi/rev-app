@@ -4,21 +4,42 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class DocumentsReportsController extends Controller
 {
-    
+    // getting the list of clients
+    public function getClientsList()
+    {
+        $data = DB::select('web.SP_ClientMembersList');
+        
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    // getting the list of debtors base on client key
+    public function getDebtorsListByClientKey(Request $request)
+    {
+        $clientKey = $request->input('clientKey');
+        $data = DB::select('web.SP_DebtorListByClient @clientKey = ?', [$clientKey]);
+        
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
     // using IRIS NOA API for creating base64 encoded PDF
     public function callNOAIRISAPI(Request $request)
     {    
         $postfields = array(
-            'clientkey' => $request->ClientKey ?? 11568, // e.g. 11568
-            'debtorkey' => $request->DebtorKey ?? 72020, // e.g. 72020
+            'clientkey' => $request->ClientKey ?? null, // e.g. 11568
+            'debtorkey' => $request->DebtorKey ?? null, // e.g. 72020
             'factor_signature' => $request->factor_signature ?? 0,
-            'acknowledge_signature' => $request->acknowledge_signature ?? 0,
+            'acknowledge_signature' => $request->acknowledge_signature ?? 1,
             'bankingdetails' => $request->bankingdetails ?? 0,
-            'bankingdetails_included' => $request->bankingdetails_included ?? 0,
+            'bankingdetails_included' => $request->bankingdetails_included ?? 1,
             'araging' => $request->araging ?? 0,
             'email_debtor' => $request->email_debtor ?? 0,
             'email_client' => $request->email_client ?? 0,
@@ -57,6 +78,10 @@ class DocumentsReportsController extends Controller
         if (isset($results['bankingdetails'])) {
             $resultType = "bankingdetails";
             $result = $results['bankingdetails'];
+        }
+        if (isset($results['email_sent'])) {
+            $resultType = "email_sent";
+            $result = $results['email_sent'];
         }
         
         return response()->json([

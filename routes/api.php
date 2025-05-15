@@ -62,6 +62,8 @@ Route::post('updateCompleteStatusRisk', [RiskMonitoringController::class, 'updat
 Route::get('creditRequests', [TicketingController::class, 'index']); 
 Route::get('invoiceDetailNotes', [ClientsInvoicesController::class, 'invoiceDetailNotes']); 
 Route::post('ClientNotesHide', [RiskMonitoringController::class, 'ClientNotesHide']);
+Route::get('getClientsList', [DocumentsReportsController::class, 'getClientsList']); 
+Route::get('getDebtorsListByClientKey', [DocumentsReportsController::class, 'getDebtorsListByClientKey']); 
 Route::get('callNOAIRISAPI', [DocumentsReportsController::class, 'callNOAIRISAPI']); 
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
