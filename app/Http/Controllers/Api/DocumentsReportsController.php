@@ -89,4 +89,80 @@ class DocumentsReportsController extends Controller
             'resultType' => $resultType,
         ]);
     }
+
+    // using IRIS Ansonia API for creating report url
+    public function callAnsoniaAPI(Request $request)
+    {
+        $postfields = array(
+            'MCNumber' => $request->MCNumber ?? '', //
+            'Name' => $request->Name ?? '', // e.g. 'ROYAL TRANSPORTATION INC.'
+            'Address' => $request->Address ?? '', // e.g. '51 KEATS TERR' 
+            'City' => $request->City ?? '', // e.g. 'BRAMPTON'
+            'State' => $request->State ?? '', // e.g. 'ON'
+            'Country' => $request->Country ?? '' // e.g. 'CANADA'
+        );
+        $postfields = json_encode($postfields);
+        
+        //$url = "http://localhost/iris/public/api/ansonia/report_url.php";
+        $url = "https://login.baron.finance/iris/public/api/ansonia/report_url.php";
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+        curl_setopt($ch, CURLOPT_HEADER, false);           // return response header
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    // return response
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_NOBODY, false);           // suppress result
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 30000);       // connection timeout (1 second = 1000)
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        
+        return response()->json([
+            'url' => $response,
+        ]);
+    }
+
+    // using IRIS invoice_image API for getting invoice pdf
+    public function callInvoiceImageAPI(Request $request)
+    {
+        $postfields = array(
+            'invoicekey' =>  $request->invoicekey ?? null, // 4547377
+            'include_stamp' => $request->includeStamp ?? 0
+        );
+        $postfields = json_encode($postfields);
+
+        //$url = "http://localhost/iris/public/api/invoice_image/create.php";
+        $url = "https://login.baron.finance/iris/public/api/invoice_image/create.php";
+
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+        curl_setopt($ch, CURLOPT_HEADER, false);           // return response header
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    // return response
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_NOBODY, false);           // suppress result
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 60000);       // connection timeout (1 second = 1000)
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        // var_dump($response);
+
+        $results = json_decode($response, true);
+        // if (isset($results['status']) && $results['status'] == 'success') {
+        //     $target = "Invoice_{$results['invno']}.pdf";
+        //     $fileout = fopen($target, 'w');
+        //     fwrite($fileout, base64_decode($results['pdf']));
+        //     fclose($fileout);
+        // }
+
+        return response()->json($results);
+    }
+
 }

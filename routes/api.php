@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\MiscDataListController;
 use App\Http\Controllers\Api\RiskMonitoringController;
 use App\Http\Controllers\Api\TicketingController;
 use App\Http\Controllers\Api\DocumentsReportsController;
+use App\Http\Controllers\Api\InvoiceSearchController;
 use App\Http\Middleware\CorsMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -65,6 +66,11 @@ Route::post('ClientNotesHide', [RiskMonitoringController::class, 'ClientNotesHid
 Route::get('getClientsList', [DocumentsReportsController::class, 'getClientsList']); 
 Route::get('getDebtorsListByClientKey', [DocumentsReportsController::class, 'getDebtorsListByClientKey']); 
 Route::get('callNOAIRISAPI', [DocumentsReportsController::class, 'callNOAIRISAPI']); 
+Route::get('callAnsoniaAPI', [DocumentsReportsController::class, 'callAnsoniaAPI']); 
+Route::get('callInvoiceImageAPI', [DocumentsReportsController::class, 'callInvoiceImageAPI']); 
+Route::get('getInvoiceStatusList', [InvoiceSearchController::class, 'getInvoiceStatusList']); 
+Route::get('getDisputeCodeList', [InvoiceSearchController::class, 'getDisputeCodeList']); 
+Route::get('getInvoicesList', [InvoiceSearchController::class, 'getInvoicesList']); 
 Route::get('/paymentsFiles/{filename}', function ($filename) {
     $path = public_path('payment_images/' . $filename);
 
