@@ -61,6 +61,8 @@ Route::post('updateCRMRisk', [RiskMonitoringController::class, 'updateCRMRisk'])
 Route::post('updateLevelRisk', [RiskMonitoringController::class, 'updateLevelRisk']);
 Route::post('updateCompleteStatusRisk', [RiskMonitoringController::class, 'updateCompleteStatusRisk']);
 Route::get('creditRequests', [TicketingController::class, 'index']); 
+Route::get('getCreditRequestStatusList', [TicketingController::class, 'getCreditRequestStatusList']); 
+Route::post('approveCreditRequest', [TicketingController::class, 'approveCreditRequest']); 
 Route::get('invoiceDetailNotes', [ClientsInvoicesController::class, 'invoiceDetailNotes']); 
 Route::post('ClientNotesHide', [RiskMonitoringController::class, 'ClientNotesHide']);
 Route::get('getClientsList', [DocumentsReportsController::class, 'getClientsList']); 

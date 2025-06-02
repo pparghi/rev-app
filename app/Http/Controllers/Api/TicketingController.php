@@ -71,4 +71,58 @@ class TicketingController extends Controller
     {
         //
     }
+
+
+    // #region Credit Request
+    // get status list for Approve/Deny credit requests
+    public function getCreditRequestStatusList()
+    {
+        $data = DB::select('web.SP_CredRequestStatus');
+        
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    // approve credit request 
+    public function approveCreditRequest(Request $request)
+    {
+        try {
+    
+            $data = DB::statement('Web.SP_CredRequestApproval 
+                @CredRequestKey = ?, 
+                @ApproveUser = ?,
+                @Status = ?,
+                @Response = ?,
+                @ApprovedLimit = ?,
+                @NewLimitAmt = ?,
+                @ExpMonths = ?', 
+                [
+                    $request->CredRequestKey,
+                    $request->ApproveUser,
+                    $request->Status,
+                    $request->Response,
+                    $request->ApprovedLimit ?? null,
+                    $request->NewLimitAmt ?? null,
+                    $request->ExpMonths
+                ]
+            );
+    
+            return response()->json([
+                'message' => 'Credit request processed successfully',
+                'data' => $data
+            ]);
+    
+        } catch (\Exception $e) {
+            \Log::error('Credit Request Approval Error:', [
+                'error' => $e->getMessage(),
+                'parameters' => $request->all()
+            ]);
+            
+            return response()->json([
+                'error' => 'Failed to process credit request',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
