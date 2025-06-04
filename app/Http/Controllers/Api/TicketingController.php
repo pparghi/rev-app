@@ -96,7 +96,8 @@ class TicketingController extends Controller
                 @Response = ?,
                 @ApprovedLimit = ?,
                 @NewLimitAmt = ?,
-                @ExpMonths = ?', 
+                @ExpMonths = ?,
+                @Email = ?', 
                 [
                     $request->CredRequestKey,
                     $request->ApproveUser,
@@ -104,7 +105,8 @@ class TicketingController extends Controller
                     $request->Response,
                     $request->ApprovedLimit ?? null,
                     $request->NewLimitAmt ?? null,
-                    $request->ExpMonths
+                    $request->ExpMonths,
+                    $request->Email
                 ]
             );
     
