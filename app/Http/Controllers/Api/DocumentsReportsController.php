@@ -30,6 +30,17 @@ class DocumentsReportsController extends Controller
         ]);
     }
 
+    // getting debtor list by debtor name
+    public function getDebtorsListByName(Request $request)
+    {
+        $debtorName = $request->input('debtorName');
+        $data = DB::select('web.SP_DebtorNameSearch @Name = ?', [$debtorName]);
+        
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
     // using IRIS NOA API for creating base64 encoded PDF
     public function callNOAIRISAPI(Request $request)
     {    

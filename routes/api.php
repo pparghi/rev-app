@@ -67,6 +67,7 @@ Route::get('invoiceDetailNotes', [ClientsInvoicesController::class, 'invoiceDeta
 Route::post('ClientNotesHide', [RiskMonitoringController::class, 'ClientNotesHide']);
 Route::get('getClientsList', [DocumentsReportsController::class, 'getClientsList']); 
 Route::get('getDebtorsListByClientKey', [DocumentsReportsController::class, 'getDebtorsListByClientKey']); 
+Route::get('getDebtorsListByName', [DocumentsReportsController::class, 'getDebtorsListByName']); 
 Route::get('callNOAIRISAPI', [DocumentsReportsController::class, 'callNOAIRISAPI']); 
 Route::get('callAnsoniaAPI', [DocumentsReportsController::class, 'callAnsoniaAPI']); 
 Route::get('callInvoiceImageAPI', [DocumentsReportsController::class, 'callInvoiceImageAPI']); 
