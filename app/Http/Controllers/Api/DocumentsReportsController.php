@@ -5,10 +5,18 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\ApiLoggingService;
 
 
 class DocumentsReportsController extends Controller
 {
+    protected $apiLogger;
+
+    public function __construct(ApiLoggingService $apiLogger)
+    {
+        $this->apiLogger = $apiLogger;
+    }
+
     // getting the list of clients
     public function getClientsList()
     {
@@ -24,6 +32,17 @@ class DocumentsReportsController extends Controller
     {
         $clientKey = $request->input('clientKey');
         $data = DB::select('web.SP_DebtorListByClient @clientKey = ?', [$clientKey]);
+        
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+     // getting the list of debtors base on client key
+    public function getNOADebtorsListByClientKey(Request $request)
+    {
+        $clientKey = $request->input('clientKey');
+        $data = DB::select('web.SP_DebtorListByClientPayToFactor @clientKey = ?', [$clientKey]);
         
         return response()->json([
             'data' => $data
@@ -55,7 +74,9 @@ class DocumentsReportsController extends Controller
             'email_debtor' => $request->email_debtor ?? 0,
             'email_client' => $request->email_client ?? 0,
             'email_crm' => $request->email_crm ?? 0,
-            'email_address' => $request->email_address ?? ''
+            'email_address' => $request->email_address ?? '',
+            'email_contactname' => $request->email_address ?? '', // need for email template
+            'email_contactemail' => $request->email_address ?? '' // need for email template
         );
         $postfields = json_encode($postfields);
         
@@ -73,6 +94,17 @@ class DocumentsReportsController extends Controller
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
         $response = curl_exec($ch);
+        // $response = '{"test": "test"}'; // For testing purposes, replace with actual API call
+
+        // Log the API call
+        $this->apiLogger->logApiCall(
+            'NOA_IRIS_API',
+            json_decode($postfields, true),
+            json_decode($response, true),
+            curl_errno($ch) ? 'error' : 'success',
+            $request->header('X-User-Id') 
+        );
+
         curl_close($ch);
 
         $result = "";
