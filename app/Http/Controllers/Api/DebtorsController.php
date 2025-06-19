@@ -12,9 +12,17 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
 use Intervention\Image\ImageManagerStatic as Image;
+use App\Services\ApiLoggingService;
 
 class DebtorsController extends Controller
 {
+    protected $apiLogger;
+
+    public function __construct(ApiLoggingService $apiLogger)
+    {
+        $this->apiLogger = $apiLogger;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -267,5 +275,52 @@ class DebtorsController extends Controller
         ]);
     }
 
+
+    /**
+     * Search for debtor's Duns number by using DnB API
+     */
+    public function searchDuns(Request $request)
+    {
+        $postfields = array(
+            'name' => $request->Name, 
+            'address' => $request->Address ?? '', 
+            'country' => in_array($request->Country, ['CA', 'US']) ? $request->Country : 'CA',
+            'environment' => 'production'
+        );
+        $postfields = json_encode($postfields);
+
+        $url = "https://login.baron.finance/iris/public/api/dnb/match.php";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+        curl_setopt($ch, CURLOPT_HEADER, false);           // return response header
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    // return response
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_NOBODY, false);           // suppress result
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 30000);       // connection timeout (1 second = 1000)
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+        $response = curl_exec($ch);
+        // $response = '{"test": "test"}'; // For testing purposes, replace with actual API call
+
+        // Log the API call
+        $this->apiLogger->logApiCall(
+            'search_Duns_API',
+            json_decode($postfields, true),
+            json_decode($response, true),
+            curl_errno($ch) ? 'error' : 'success',
+            $request->header('X-User-Id')
+        );
+
+        curl_close($ch);
+
+        $results = json_decode($response, true);
+        
+        return response()->json([
+            'results' => $results,
+        ]);
+    }
 
 }

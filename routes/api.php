@@ -30,6 +30,7 @@ Route::get('debtorPaymentsImages', [DebtorsController::class, 'debtorPaymentsIma
 Route::post('updateDebtorDetails', [DebtorsController::class, 'updateDebtorDetails']);
 Route::get('DebtorChecksSearch', [DebtorsController::class, 'DebtorChecksSearch']);
 Route::get('debtorHistoryTrend', [DebtorsController::class, 'debtorHistoryTrend']);
+Route::get('searchDuns', [DebtorsController::class, 'searchDuns']);
 // Route::post('updateDebtorCreditLimit', [DebtorsController::class, 'updateCreditLimit']);
 // Route::post('updateDebtorAccountStatus', [DebtorsController::class, 'updateAccountStatus']);
 Route::resource('memberDebtors', MemberDebtorsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);
