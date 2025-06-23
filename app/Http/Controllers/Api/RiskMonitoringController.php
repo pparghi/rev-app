@@ -223,4 +223,32 @@ class RiskMonitoringController extends Controller
     {
         //
     }
+
+
+    // get client summary note
+    public function getClientSummaryNote(Request $request)
+    {
+        $ClientKey = $request->input('ClientKey');
+        $ClientSummaryNote = DB::select('Web.SP_ClientSummaryText @ClientKey = ?', [$ClientKey]);
+        
+        return response()->json([
+            'ClientSummaryNote' => $ClientSummaryNote
+        ]);
+    }
+
+    // set client summary note
+    public function setClientSummaryNote(Request $request)
+    {
+        $ClientKey = $request->input('ClientKey');
+        $SummaryText = $request->input('SummaryText');
+
+        try {
+            DB::statement('Web.SP_ClientSummaryTextMod @ClientKey = ?, @TermDesc = ?', [$ClientKey, $SummaryText]);
+            return response()->json([
+                'message' => 'Client summary text updated successfully',
+            ]);
+        } catch(\Exception $e) {
+            return response()->json(['error' => 'Failed to set summary note', 'message' => $e->getMessage()], 500);
+        }
+    }
 }
