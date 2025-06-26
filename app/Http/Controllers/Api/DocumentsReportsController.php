@@ -76,7 +76,8 @@ class DocumentsReportsController extends Controller
             'email_crm' => $request->email_crm ?? 0,
             'email_address' => $request->email_address ?? '',
             'email_contactname' => $request->email_contactname ?? '', // need for email template
-            'email_contactemail' => $request->email_contactemail ?? '' // need for email template
+            'email_contactemail' => $request->email_contactemail ?? '', // need for email template
+            'email_contactext' => $request->email_contactext ?? '',
         );
         $postfields = json_encode($postfields);
         
