@@ -163,7 +163,8 @@ class RiskMonitoringController extends Controller
         $DueDate = $request->input('DueDate');
 
         try {
-            DB::statement('web.SP_ClientNotesAdd @ClientKey = ?, @Category = ?, @Notes = ?, @Currency = ?, @Risk = ?, @CreatedBy = ?, @DueDate = ?', [$ClientKey, $Category, $Notes, $Currency, $Risk, $CreatedBy, $DueDate]);
+            $result = DB::statement('web.SP_ClientNotesAdd @ClientKey = ?, @Category = ?, @Notes = ?, @Currency = ?, @Risk = ?, @CreatedBy = ?, @DueDate = ?', [$ClientKey, $Category, $Notes, $Currency, $Risk, $CreatedBy, $DueDate]);
+            return response()->json(['result' => $result]);
         } catch(\Exception $e) {
             return response()->json(['error' => 'Failed to add note', 'message' => $e->getMessage()], 500);
         }
@@ -175,7 +176,8 @@ class RiskMonitoringController extends Controller
         $Userkey = $request->input('UserKey');
 
         try {
-            DB::statement('web.SP_ClientCRMUpdate @ClientKey = ?, @AcctExec = ?, @Userkey = ?', [$ClientKey, $crm, $Userkey]);
+            $result = DB::statement('web.SP_ClientCRMUpdate @ClientKey = ?, @AcctExec = ?, @Userkey = ?', [$ClientKey, $crm, $Userkey]);
+            return response()->json(['result' => $result]);
         } catch(\Exception $e) {
             return response()->json(['error' => 'Failed to update crm', 'message' => $e->getMessage()], 500);
         }
@@ -187,7 +189,8 @@ class RiskMonitoringController extends Controller
         $Userkey = $request->input('UserKey');
 
         try {
-            DB::statement('web.SP_ClientLevelsChange @ClientKey = ?, @GroupValue = ?, @Userkey = ?', [$ClientKey, $GroupValue, $Userkey]);
+            $result = DB::statement('web.SP_ClientLevelsChange @ClientKey = ?, @GroupValue = ?, @Userkey = ?', [$ClientKey, $GroupValue, $Userkey]);
+            return response()->json(['result' => $result]);
         } catch(\Exception $e) {
             return response()->json(['error' => 'Failed to update Level', 'message' => $e->getMessage()], 500);
         }

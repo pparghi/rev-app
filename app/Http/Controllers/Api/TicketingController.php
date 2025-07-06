@@ -127,4 +127,39 @@ class TicketingController extends Controller
             ], 500);
         }
     }
+
+    // the API check and modify Credit Request Lock Ticket
+    public function actionToCreditRequest(Request $request)
+    {
+        try {
+            // Execute the stored procedure and capture the result directly
+            $result = DB::select('EXEC Web.SP_CredRequestLockTicket 
+            @CredRequestKey = ?, 
+            @InUseUser = ?,
+            @LockUnlock = ?',
+                [
+                    $request->CredRequestKey,
+                    $request->InUseUser,
+                    $request->LockUnlock
+                ]
+            );
+
+            return response()->json([
+                'status' => 'success',
+                'result' => $result
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error to lock/unlock credit request:', [
+                'error' => $e->getMessage(),
+                'parameters' => $request->all()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to lock/unlock credit request',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

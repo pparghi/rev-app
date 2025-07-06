@@ -66,6 +66,7 @@ Route::post('setClientSummaryNote', [RiskMonitoringController::class, 'setClient
 Route::get('creditRequests', [TicketingController::class, 'index']); 
 Route::get('getCreditRequestStatusList', [TicketingController::class, 'getCreditRequestStatusList']); 
 Route::post('approveCreditRequest', [TicketingController::class, 'approveCreditRequest']); 
+Route::get('actionToCreditRequest', [TicketingController::class, 'actionToCreditRequest']); 
 Route::get('invoiceDetailNotes', [ClientsInvoicesController::class, 'invoiceDetailNotes']); 
 Route::post('ClientNotesHide', [RiskMonitoringController::class, 'ClientNotesHide']);
 Route::get('getClientsList', [DocumentsReportsController::class, 'getClientsList']); 
@@ -75,6 +76,8 @@ Route::get('getDebtorsListByName', [DocumentsReportsController::class, 'getDebto
 Route::get('callNOAIRISAPI', [DocumentsReportsController::class, 'callNOAIRISAPI']); 
 Route::get('callAnsoniaAPI', [DocumentsReportsController::class, 'callAnsoniaAPI']); 
 Route::get('callInvoiceImageAPI', [DocumentsReportsController::class, 'callInvoiceImageAPI']); 
+Route::get('callLORCreatePDFAPI', [DocumentsReportsController::class, 'callLORCreatePDFAPI']); 
+Route::get('callLORCreatePDFsAPI', [DocumentsReportsController::class, 'callLORCreatePDFsAPI']); 
 Route::get('getInvoiceStatusList', [InvoiceSearchController::class, 'getInvoiceStatusList']); 
 Route::get('getDisputeCodeList', [InvoiceSearchController::class, 'getDisputeCodeList']); 
 Route::get('getInvoicesList', [InvoiceSearchController::class, 'getInvoicesList']); 

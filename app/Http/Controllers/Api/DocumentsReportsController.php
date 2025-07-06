@@ -38,7 +38,7 @@ class DocumentsReportsController extends Controller
         ]);
     }
 
-     // getting the list of debtors base on client key
+     // getting the list of debtors base on client key, excluding DEBTOR DOES NOT PAY FACTOR of nobuy debtors
     public function getNOADebtorsListByClientKey(Request $request)
     {
         $clientKey = $request->input('clientKey');
@@ -207,6 +207,92 @@ class DocumentsReportsController extends Controller
         // }
 
         return response()->json($results);
+    }
+
+
+    // using IRIS release letter(LOR) API for creating base64 encoded PDF
+    public function callLORCreatePDFAPI(Request $request)
+    {    
+        $postfields = array(
+            'clientkey' => $request->ClientKey,
+            'debtorkey' => $request->DebtorKey ?? 0,
+            'marknobuy' => $request->Marknobuy ?? 0,
+            'watermark' => $request->Watermark ?? 0,
+            'userkey' => $request->header('X-User-Id')
+        );
+        $postfields = json_encode($postfields);
+        
+        $url = "https://login.baron.finance/iris/public/api/release_letter/create_pdf.php";
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+        curl_setopt($ch, CURLOPT_HEADER, false);           // return response header
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    // return response
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_NOBODY, false);           // suppress result
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 30000);       // connection timeout (1 second = 1000)
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+        $response = curl_exec($ch);
+
+        // Log the API call
+        $this->apiLogger->logApiCall(
+            'NOA_Release_Letter_Create_PDF_API',
+            json_decode($postfields, true),
+            json_decode($response, true),
+            curl_errno($ch) ? 'error' : 'success',
+            $request->header('X-User-Id') 
+        );
+
+        curl_close($ch);
+
+        $decodedResponse = json_decode($response, true);
+        return response()->json($decodedResponse);
+    }
+
+    // using IRIS release letter(LOR) API for creating base64 encoded PDF for all debtors of a client
+    // this API includes sendemail parameter and no debtorKey parameter
+    public function callLORCreatePDFsAPI(Request $request)
+    {    
+        $postfields = array(
+            'clientkey' => $request->ClientKey,
+            'marknobuy' => $request->Marknobuy ?? 0,
+            'watermark' => $request->Watermark ?? 0,
+            'sendemail' => $request->Sendemail ?? 0,
+            'userkey' => $request->header('X-User-Id')
+        );
+        $postfields = json_encode($postfields);
+        
+        $url = "https://login.baron.finance/iris/public/api/release_letter/create_pdfs.php";
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+        curl_setopt($ch, CURLOPT_HEADER, false);           // return response header
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);    // return response
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_NOBODY, false);           // suppress result
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 30000);       // connection timeout (1 second = 1000)
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+        $response = curl_exec($ch);
+
+        // Log the API call
+        $this->apiLogger->logApiCall(
+            'NOA_Release_Letter_Create_PDFs_API',
+            json_decode($postfields, true),
+            json_decode($response, true),
+            curl_errno($ch) ? 'error' : 'success',
+            $request->header('X-User-Id') 
+        );
+
+        curl_close($ch);
+
+        $decodedResponse = json_decode($response, true);
+        return response()->json($decodedResponse);
     }
 
 }
