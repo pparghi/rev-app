@@ -284,6 +284,10 @@ class DebtorsController extends Controller
         $postfields = array(
             'name' => $request->Name, 
             'address' => $request->Address ?? '', 
+            'addressLine2' => $request->AddressLine2 ?? '', 
+            'city' => $request->City ?? '', 
+            'state' => $request->State ?? '', 
+            'zipCode' => $request->ZipCode ?? '', 
             'country' => in_array($request->Country, ['CA', 'US']) ? $request->Country : 'CA',
             'environment' => 'production'
         );
