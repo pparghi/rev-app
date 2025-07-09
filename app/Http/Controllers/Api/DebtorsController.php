@@ -27,7 +27,7 @@ class DebtorsController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {          
+    {
         $mail = base64_decode($request->token);
 
         if ($mail != "") {
@@ -36,29 +36,37 @@ class DebtorsController extends Controller
             $user = [];
         }
         // if(count($user) > 0){                     
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 25);
-            $offset = ($page * $perPage)/$perPage;
-            $search = $request->input('search') ? $request->input('search') : '';
-            $sortBy = $request->input('sortBy', 'Balance');
-            $sortOrder = $request->input('sortOrder', 'DESC');
-            $filterByBalance = $request->input('filterByBalance');
+        $page = $request->get('page', 1);
+        $perPage = $request->get('per_page', 25);
+        $offset = ($page * $perPage) / $perPage;
+        $search = $request->input('search') ? $request->input('search') : '';
+        $sortBy = $request->input('sortBy', 'Balance');
+        $sortOrder = $request->input('sortOrder', 'DESC');
+        $filterByBalance = $request->input('filterByBalance');
 
+        try {
             $data = DB::select('web.SP_DebtorMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?,@filterByBalance = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance]);
-
-            $DebtoNoBuyDisputeList = DB::select('Web.SP_DebtoNoBuyDisputeList');
-
-            $total = DB::select('web.SP_CountDebtorMasterDetails');
-            
-            $response = response()->json([
-                'DebtoNoBuyDisputeList' => $DebtoNoBuyDisputeList,
-                'data' => $data,
-                'total' => $total[0],
-                'per_page' => $perPage,
-                'current_page' => $page
+        } catch (Exception $e) {
+            \Log::error("web.SP_DebtorMasterDetails request failed", [
+                'error' => $e->getMessage(),
+                'is_deadlock' => str_contains($e->getMessage(), 'deadlock')
             ]);
+            throw $e;
+        }
 
-            return $response;   
+        $DebtoNoBuyDisputeList = DB::select('Web.SP_DebtoNoBuyDisputeList');
+
+        $total = DB::select('web.SP_CountDebtorMasterDetails');
+
+        $response = response()->json([
+            'DebtoNoBuyDisputeList' => $DebtoNoBuyDisputeList,
+            'data' => $data,
+            'total' => $total[0],
+            'per_page' => $perPage,
+            'current_page' => $page
+        ]);
+
+        return $response;
         // }else{
         //     return response()->json(['message' => 'User not found'], 404);
         // }        
