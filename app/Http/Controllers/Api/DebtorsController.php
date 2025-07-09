@@ -47,11 +47,29 @@ class DebtorsController extends Controller
         try {
             $data = DB::select('web.SP_DebtorMasterDetails @OFFSET = ?, @LIMIT = ?, @SEARCH = ?, @sortColumn = ?, @sortDirection = ?,@filterByBalance = ?', [$offset, $perPage, $search, $sortBy, $sortOrder, $filterByBalance]);
         } catch (Exception $e) {
+            $isTimeout = str_contains($e->getMessage(), 'timeout') || 
+            str_contains($e->getMessage(), 'Lock request time out') ||
+            str_contains($e->getMessage(), 'query timeout');
+
             \Log::error("web.SP_DebtorMasterDetails request failed", [
                 'error' => $e->getMessage(),
                 'is_deadlock' => str_contains($e->getMessage(), 'deadlock')
             ]);
+
+            // Return timeout response immediately on first attempt
+            if ($isTimeout) {
+                return response()->json([
+                    'error' => 'Request timed out',
+                    'code' => 'TIMEOUT',
+                    'message' => 'The query took too long to execute. This is a test timeout scenario.',
+                    'params' => compact('offset', 'perPage', 'search', 'sortBy', 'sortOrder', 'filterByBalance')
+                ], 408);
+            }
+
             throw $e;
+        } finally {
+            // Reset lock timeout to default
+            DB::statement('SET LOCK_TIMEOUT -1');
         }
 
         $DebtoNoBuyDisputeList = DB::select('Web.SP_DebtoNoBuyDisputeList');
