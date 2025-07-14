@@ -261,7 +261,8 @@ class DocumentsReportsController extends Controller
             'marknobuy' => $request->Marknobuy ?? 0,
             'watermark' => $request->Watermark ?? 0,
             'sendemail' => $request->Sendemail ?? 0,
-            'userkey' => $request->header('X-User-Id')
+            'userkey' => $request->header('X-User-Id'),
+            'userExtension' => $request->UserExtension ?? ''
         );
         $postfields = json_encode($postfields);
         
