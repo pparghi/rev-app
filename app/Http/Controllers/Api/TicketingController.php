@@ -128,6 +128,51 @@ class TicketingController extends Controller
         }
     }
 
+    // approve credit request version 2 - New API, need put to API dictionary
+    public function approveCreditRequest2(Request $request)
+    {
+        try {
+    
+            $response = DB::select('Web.SP_CredRequestApproval2 
+                @CredRequestKey = ?, 
+                @ApproveUser = ?,
+                @Status = ?,
+                @Response = ?,
+                @NewTotalCreditLimit = ?,
+                @NewIndivCreditLimit = ?,
+                @ExpMonths = ?,
+                @Email = ?, 
+                @ChangeMaster = ?',
+                [
+                    $request->CredRequestKey,
+                    $request->ApproveUser,
+                    $request->Status,
+                    $request->Response,
+                    $request->NewTotalCreditLimit ?? null,
+                    $request->NewIndivCreditLimit ?? null,
+                    $request->ExpMonths,
+                    $request->Email,
+                    $request->ChangeMaster
+                ]
+            );
+    
+            return response()->json([
+                'response' => $response
+            ]);
+    
+        } catch (\Exception $e) {
+            \Log::error('Credit Request Approval Error:', [
+                'error' => $e->getMessage(),
+                'parameters' => $request->all()
+            ]);
+            
+            return response()->json([
+                'error' => 'Failed to process credit request',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     // the API check and modify Credit Request Lock Ticket
     public function actionToCreditRequest(Request $request)
     {
