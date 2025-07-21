@@ -5,9 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\ApiLoggingService;
 
 class TicketingController extends Controller
 {
+    protected $apiLogger;
+
+    public function __construct(ApiLoggingService $apiLogger)
+    {
+        $this->apiLogger = $apiLogger;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -155,12 +163,30 @@ class TicketingController extends Controller
                     $request->ChangeMaster
                 ]
             );
+
+            // Log the API call
+            $this->apiLogger->logApiCall(
+                'CredRequestApproval2',                    // apiName
+                $request->all(),                              // request (array)
+                $response,                                    // response (can be array or object)
+                'success',                                    // status
+                $request->ApproveUser                 // userId (optional)
+            );
     
             return response()->json([
                 'response' => $response
             ]);
     
         } catch (\Exception $e) {
+            // Log the error case
+            $this->apiLogger->logApiCall(
+                'SP_CredRequestApproval2',                    // apiName
+                $request->all(),                              // request (array)
+                ['error' => $e->getMessage()],                // response (error info)
+                'error',                                      // status
+                $request->ApproveUser                 // userId (optional)
+            );
+
             \Log::error('Credit Request Approval Error:', [
                 'error' => $e->getMessage(),
                 'parameters' => $request->all()
