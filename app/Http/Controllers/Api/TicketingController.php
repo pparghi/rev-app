@@ -155,7 +155,7 @@ class TicketingController extends Controller
                     $request->CredRequestKey,
                     $request->ApproveUser,
                     $request->Status,
-                    $request->Response,
+                    $request->Response ?? '',
                     $request->NewTotalCreditLimit ?? null,
                     $request->NewIndivCreditLimit ?? null,
                     $request->ExpMonths,
