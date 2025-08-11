@@ -353,4 +353,31 @@ class DebtorsController extends Controller
         ]);
     }
 
+    // getting the Debtor No Buy Code List 
+    public function getDebtorNoBuyCodeList()
+    {
+        $data = DB::select('web.SP_DebtoNoBuyDisputeList');
+        
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    // method to update debtor's No Buy Code
+    public function updateDebtorNoBuyCode(Request $request){
+        try {
+            $DebtorKey = $request->DebtorKey ? $request->DebtorKey : '';
+            $NoBuyDisputeKey = $request->NoBuyDisputeKey ? $request->NoBuyDisputeKey : '';
+            $CredAppBy = $request->CredAppBy ? $request->CredAppBy : '';
+
+            DB::statement('web.SP_DebtorChangeNoBuyDispute @DebtorKey = ?, @NoBuyDisputeKey = ?, @CredAppBy = ?', [$DebtorKey, $NoBuyDisputeKey, $CredAppBy]);
+            
+            return response()->json(['message' => 'Debtor No Buy Code updated successfully']);
+        } catch(ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch(Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 }
