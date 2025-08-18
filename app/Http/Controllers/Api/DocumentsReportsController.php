@@ -38,7 +38,7 @@ class DocumentsReportsController extends Controller
         ]);
     }
 
-     // getting the list of debtors base on client key, excluding DEBTOR DOES NOT PAY FACTOR of nobuy debtors
+    // getting the list of debtors base on client key, excluding DEBTOR DOES NOT PAY FACTOR of nobuy debtors
     public function getNOADebtorsListByClientKey(Request $request)
     {
         $clientKey = $request->input('clientKey');
@@ -295,5 +295,33 @@ class DocumentsReportsController extends Controller
         $decodedResponse = json_decode($response, true);
         return response()->json($decodedResponse);
     }
+
+    //region clients documents
+    // get clients document categories
+    public function getClientDocumentCategory()
+    {
+        $data = DB::select('web.SP_DocumentCategoryClients');
+        
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    // getting the list of clients documents base on 
+    public function getClientDocumentList(Request $request)
+    {
+        $ClientName = $request->ClientName ?? '';
+        $DocCatKey = $request->DocCatKey ?? '';
+        $FileName = $request->FileName ?? '';
+
+        $data = DB::select('web.SP_DocumentsListByClient @ClientName = ?, @DocCatKey = ?, @FileName = ?', [$ClientName, $DocCatKey, $FileName]);
+        
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+
+    //endregion clients documents
 
 }

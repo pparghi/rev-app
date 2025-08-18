@@ -81,6 +81,8 @@ Route::get('callAnsoniaAPI', [DocumentsReportsController::class, 'callAnsoniaAPI
 Route::get('callInvoiceImageAPI', [DocumentsReportsController::class, 'callInvoiceImageAPI']); 
 Route::get('callLORCreatePDFAPI', [DocumentsReportsController::class, 'callLORCreatePDFAPI']); 
 Route::get('callLORCreatePDFsAPI', [DocumentsReportsController::class, 'callLORCreatePDFsAPI']); 
+Route::get('getClientDocumentCategory', [DocumentsReportsController::class, 'getClientDocumentCategory']); 
+Route::get('getClientDocumentList', [DocumentsReportsController::class, 'getClientDocumentList']); 
 Route::get('getInvoiceStatusList', [InvoiceSearchController::class, 'getInvoiceStatusList']); 
 Route::get('getDisputeCodeList', [InvoiceSearchController::class, 'getDisputeCodeList']); 
 Route::get('getInvoicesList', [InvoiceSearchController::class, 'getInvoicesList']); 
