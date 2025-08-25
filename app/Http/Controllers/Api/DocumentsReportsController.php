@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\ApiLoggingService;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 
 class DocumentsReportsController extends Controller
@@ -79,9 +82,26 @@ class DocumentsReportsController extends Controller
             'email_contactemail' => $request->email_contactemail ?? '', // need for email template
             'email_contactext' => $request->email_contactext ?? '',
         );
+        // $postfields = array(
+        //     'clientkey' => $request->ClientKey ?? null, // e.g. 11568
+        //     'debtorkey' => $request->DebtorKey ?? null, // e.g. 72020
+        //     'factor_signature' => $request->factor_signature ?? 0,
+        //     'acknowledge_signature' => $request->acknowledge_signature ?? 1,
+        //     'bankingdetails' => $request->bankingdetails ?? 0,
+        //     'bankingdetails_included' => $request->bankingdetails_included ?? 1,
+        //     'araging' => $request->araging ?? 0,
+        //     'email_debtor' => 0,
+        //     'email_client' => 0,
+        //     'email_crm' => 0,
+        //     'email_address' => '', // test email on mine email address rsun@revinc.com
+        //     'email_contactname' => $request->email_contactname ?? '', // need for email template
+        //     'email_contactemail' => $request->email_contactemail ?? '', // need for email template
+        //     'email_contactext' => $request->email_contactext ?? '',
+        // );
         $postfields = json_encode($postfields);
         
         $url = "https://login.baron.finance/iris/public/api/noa/create_noa.php";
+        // $url = "https://iris.revinc.com/iris/public/api/noa/create_noa.php";
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -91,7 +111,7 @@ class DocumentsReportsController extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_NOBODY, false);           // suppress result
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 30000);       // connection timeout (1 second = 1000)
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 60000);       // connection timeout (1 second = 1000)
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
         $response = curl_exec($ch);
@@ -102,7 +122,7 @@ class DocumentsReportsController extends Controller
             'NOA_IRIS_API',
             json_decode($postfields, true),
             json_decode($response, true),
-            curl_errno($ch) ? 'error' : 'success',
+            curl_errno($ch) ? 'error #: '+ curl_errno($ch) + '; error detail: '+ curl_error($ch): 'success',
             $request->header('X-User-Id') 
         );
 
@@ -218,11 +238,13 @@ class DocumentsReportsController extends Controller
             'debtorkey' => $request->DebtorKey ?? 0,
             'marknobuy' => $request->Marknobuy ?? 0,
             'watermark' => $request->Watermark ?? 0,
-            'userkey' => $request->header('X-User-Id')
+            'userkey' => $request->header('X-User-Id'),
+            'email_debtor' => $request->EmailDebtor ?? 0
         );
         $postfields = json_encode($postfields);
         
-        $url = "https://login.baron.finance/iris/public/api/release_letter/create_pdf.php";
+        // $url = "https://login.baron.finance/iris/public/api/release_letter/create_pdf.php";
+        $url = "https://iris.revinc.com/iris/public/api/release_letter/create_pdf.php";
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -264,9 +286,18 @@ class DocumentsReportsController extends Controller
             'userkey' => $request->header('X-User-Id'),
             'userExtension' => $request->UserExtension ?? ''
         );
+        // $postfields = array(
+        //     'clientkey' => $request->ClientKey,
+        //     'marknobuy' => $request->Marknobuy ?? 0,
+        //     'watermark' => $request->Watermark ?? 0,
+        //     'sendemail' => 0,
+        //     'userkey' => $request->header('X-User-Id'),
+        //     'userExtension' => $request->UserExtension ?? ''
+        // );
         $postfields = json_encode($postfields);
         
-        $url = "https://login.baron.finance/iris/public/api/release_letter/create_pdfs.php";
+        // $url = "https://login.baron.finance/iris/public/api/release_letter/create_pdfs.php";
+        $url = "https://iris.revinc.com/iris/public/api/release_letter/create_pdfs.php";
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -294,6 +325,10 @@ class DocumentsReportsController extends Controller
 
         $decodedResponse = json_decode($response, true);
         return response()->json($decodedResponse);
+
+        // no need to wait for the response from the API
+        // var_dump($response);
+        // return response()->json(['status' => 'success', 'message' => 'PDFs created successfully.']);
     }
 
     //region clients documents
@@ -321,6 +356,152 @@ class DocumentsReportsController extends Controller
         ]);
     }
 
+    // display PDF file
+    public function showPdf(Request $request)
+    {
+        if ($request->has('pdf')) {
+            $file = base64_decode($request->get('pdf'));
+            
+            $fileName = basename($file);
+            if ($request->has('title')) {
+                $fileName = base64_decode($request->get('title')).'.pdf';
+            } else if (!$fileName) {
+                $fileName = "document.pdf";
+            }
+            
+            if (file_exists($file)) {
+                return response()->file($file, [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+                ]);
+            }
+        }
+        
+        return response()->json(['error' => 'File not found'], 404);
+    }
+
+    
+    // getting full list of clients
+    public function getClientFullList(Request $request)
+    {
+        $masterList = DB::select('web.SP_ClientListAll @MasterClient = 1');
+        $memberList = DB::select('web.SP_ClientListAll @MasterClient = 0');
+        
+        return response()->json([
+            'masterClients' => $masterList,
+            'memberClients' => $memberList
+        ]);
+    }
+
+    // Upload a client document and save to the database
+    public function uploadClientDocument(Request $request)
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'file' => 'required|file',
+                'clientKey' => 'required',
+                'clientId' => 'required',
+                'clientName' => 'required',
+                'category' => 'required',
+                'description' => 'nullable|string'
+            ]);
+
+            // Get the uploaded file
+            $file = $request->file('file');
+            $originalFileName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            
+            // Store the file temporarily
+            // $tempPath = storage_path('app/temp');
+            // if (!File::exists($tempPath)) {
+            //     File::makeDirectory($tempPath, 0755, true);
+            // }
+            
+            // $tempFile = $tempPath . '/' . $originalFileName;
+            // move_uploaded_file($file->getRealPath(), $tempFile);
+            
+            // Get folder information from stored procedure
+            $folderInfo = DB::select('EXEC [Web].[SP_DocumentsFolder]');
+            
+            if (empty($folderInfo)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to get document folder information'
+                ], 500);
+            }
+            
+            $destinationPath = $folderInfo[0]->Path ?? null;
+            $folder = $folderInfo[0]->DocFolderKey ?? null;
+            
+            if (!$destinationPath || !$folder) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid destination path or folder'
+                ], 500);
+            }
+            
+            // Ensure destination directory exists
+            // if (!File::exists($destinationPath)) {
+            //     File::makeDirectory($destinationPath, 0755, true);
+            // }
+            
+            // Add document to database using stored procedure
+            $clientKey = $request->input('clientKey');
+            $description = $request->input('description') ?? '';
+            $category = $request->input('category');
+            
+            $result = DB::select('EXEC [Web].[SP_DocumentsAddByClient] ?, ?, ?, ?, ?', [
+                $clientKey,
+                $description,
+                $originalFileName,
+                $category,
+                $folder
+            ]);
+            
+            if (empty($result)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to add document to database'
+                ], 500);
+            }
+            
+            // Get the DocHdrKey from the stored procedure result
+            $docHdrKey = $result[0]->DocHdrKey ?? null;
+            
+            if (!$docHdrKey) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to get DocHdrKey from database'
+                ], 500);
+            }
+            
+            // Create the final filename using DocHdrKey
+            $newFileName = $docHdrKey . '.' . $extension;
+            // $finalPath = $destinationPath . '\\' . $newFileName;
+            
+            // Move the file to the final destination
+            $file->move($destinationPath, $newFileName);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Document uploaded successfully',
+                'data' => [
+                    'docHdrKey' => $docHdrKey,
+                    'fileName' => $newFileName,
+                    'path' => $destinationPath
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Document upload error: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error uploading document: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 
     //endregion clients documents
 
