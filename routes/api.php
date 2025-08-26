@@ -83,7 +83,7 @@ Route::get('callLORCreatePDFAPI', [DocumentsReportsController::class, 'callLORCr
 Route::get('callLORCreatePDFsAPI', [DocumentsReportsController::class, 'callLORCreatePDFsAPI']); 
 Route::get('getClientDocumentCategory', [DocumentsReportsController::class, 'getClientDocumentCategory']); 
 Route::get('getClientDocumentList', [DocumentsReportsController::class, 'getClientDocumentList']); 
-Route::get('showPdf', [DocumentsReportsController::class, 'showPdf']); 
+Route::get('showFile', [DocumentsReportsController::class, 'showFile']); 
 Route::get('getClientFullList', [DocumentsReportsController::class, 'getClientFullList']); 
 Route::post('uploadClientDocument', [DocumentsReportsController::class, 'uploadClientDocument']);
 Route::get('getInvoiceStatusList', [InvoiceSearchController::class, 'getInvoiceStatusList']); 

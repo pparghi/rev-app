@@ -357,23 +357,53 @@ class DocumentsReportsController extends Controller
     }
 
     // display PDF file
-    public function showPdf(Request $request)
+    public function showFile(Request $request)
     {
-        if ($request->has('pdf')) {
-            $file = base64_decode($request->get('pdf'));
+        if ($request->has('encodeFilePath')) {
+            $file = base64_decode($request->get('encodeFilePath'));
+
+            $imageTypes = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP', 'SVG'];
             
-            $fileName = basename($file);
-            if ($request->has('title')) {
-                $fileName = base64_decode($request->get('title')).'.pdf';
-            } else if (!$fileName) {
-                $fileName = "document.pdf";
+            if ($request->has('fileType') && in_array(strtoupper($request->get('fileType')), $imageTypes)) {
+                if (file_exists($file)) {
+                    $mimeType = mime_content_type($file);
+                    if (in_array($mimeType, ['image/jpeg', 'image/png', 'image/gif'])) {
+                        return response()->file($file, [
+                            'Content-Type' => $mimeType,
+                            'Content-Disposition' => 'inline; filename="' . basename($file) . '"',
+                        ]);
+                    }
+                }
+                 else {
+                    return response()->json(['error' => 'File not found or not an image'], 404);
+                }
             }
-            
-            if (file_exists($file)) {
-                return response()->file($file, [
-                    'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'inline; filename="' . $fileName . '"',
-                ]);
+            else if ($request->has('fileType') && strtoupper($request->get('fileType')) == 'PDF') {
+                $fileName = basename($file);
+                if ($request->has('title')) {
+                    $fileName = base64_decode($request->get('title')).'.pdf';
+                } else if (!$fileName) {
+                    $fileName = "document.pdf";
+                }
+                
+                if (file_exists($file)) {
+                    return response()->file($file, [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+                    ]);
+                }
+            }
+            else {
+                $fileName = basename($file);
+                if ($request->has('title')) {
+                    $fileName = base64_decode($request->get('title')).'.'.pathinfo($file, PATHINFO_EXTENSION);
+                } else if (!$fileName) {
+                    $fileName = "document.".pathinfo($file, PATHINFO_EXTENSION);
+                }
+                
+                if (file_exists($file)) {
+                    return response()->download($file, $fileName);
+                }
             }
         }
         
@@ -404,7 +434,8 @@ class DocumentsReportsController extends Controller
                 'clientId' => 'required',
                 'clientName' => 'required',
                 'category' => 'required',
-                'description' => 'nullable|string'
+                'description' => 'nullable|string',
+                'userID' => 'required'
             ]);
 
             // Get the uploaded file
@@ -435,6 +466,27 @@ class DocumentsReportsController extends Controller
             $folder = $folderInfo[0]->DocFolderKey ?? null;
             
             if (!$destinationPath || !$folder) {
+                // Log failure - invalid path
+                $this->apiLogger->logApiCall(
+                    'ClientDocumentUpload',
+                    [
+                        'clientKey' => $request->input('clientKey'),
+                        'clientId' => $request->input('clientId'),
+                        'clientName' => $request->input('clientName'),
+                        'category' => $request->input('category'),
+                        'description' => $request->input('description'),
+                        'fileName' => $originalFileName,
+                        'extension' => $extension,
+                        'fileSize' => $file->getSize(),
+                        'fileType' => $file->getMimeType(),
+                        'destinationPath' => $destinationPath,
+                        'folder' => $folder
+                    ],
+                    ['error' => 'Invalid destination path or folder'],
+                    'error',
+                    $request->input('userID')
+                );
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid destination path or folder'
@@ -460,6 +512,27 @@ class DocumentsReportsController extends Controller
             ]);
             
             if (empty($result)) {
+                // Log failure - database error
+                $this->apiLogger->logApiCall(
+                    'ClientDocumentUpload',
+                    [
+                        'clientKey' => $clientKey,
+                        'clientId' => $request->input('clientId'),
+                        'clientName' => $request->input('clientName'),
+                        'category' => $category,
+                        'description' => $description,
+                        'fileName' => $originalFileName,
+                        'extension' => $extension,
+                        'fileSize' => $file->getSize(),
+                        'fileType' => $file->getMimeType(),
+                        'destinationPath' => $destinationPath,
+                        'folder' => $folder
+                    ],
+                    ['error' => 'Failed to add document to database'],
+                    'error',
+                    $request->input('userID')
+                );
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to add document to database'
@@ -470,6 +543,27 @@ class DocumentsReportsController extends Controller
             $docHdrKey = $result[0]->DocHdrKey ?? null;
             
             if (!$docHdrKey) {
+                // Log failure - missing DocHdrKey
+                $this->apiLogger->logApiCall(
+                    'ClientDocumentUpload',
+                    [
+                        'clientKey' => $clientKey,
+                        'clientId' => $request->input('clientId'),
+                        'clientName' => $request->input('clientName'),
+                        'category' => $category,
+                        'description' => $description,
+                        'fileName' => $originalFileName,
+                        'extension' => $extension,
+                        'fileSize' => $file->getSize(),
+                        'fileType' => $file->getMimeType(),
+                        'destinationPath' => $destinationPath,
+                        'folder' => $folder
+                    ],
+                    ['error' => 'Failed to get DocHdrKey from database'],
+                    'error',
+                    $request->input('userID')
+                );
+            
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to get DocHdrKey from database'
@@ -482,6 +576,29 @@ class DocumentsReportsController extends Controller
             
             // Move the file to the final destination
             $file->move($destinationPath, $newFileName);
+
+            // Log success
+            $this->apiLogger->logApiCall(
+                'ClientDocumentUpload',
+                [
+                    'clientKey' => $clientKey,
+                    'clientId' => $request->input('clientId'),
+                    'clientName' => $request->input('clientName'),
+                    'category' => $category,
+                    'description' => $description,
+                    'fileName' => $originalFileName,
+                    'extension' => $extension
+                ],
+                [
+                    'success' => true,
+                    'docHdrKey' => $docHdrKey,
+                    'fileName' => $newFileName,
+                    'path' => $destinationPath,
+                    'folder' => $folder
+                ],
+                'success',
+                $request->input('userID')
+            );
             
             return response()->json([
                 'success' => true,
@@ -495,6 +612,26 @@ class DocumentsReportsController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Document upload error: ' . $e->getMessage());
+
+            // Log the exception
+            $this->apiLogger->logApiCall(
+                'ClientDocumentUpload',
+                [
+                    'clientKey' => $clientKey,
+                    'clientId' => $request->input('clientId'),
+                    'clientName' => $request->input('clientName'),
+                    'category' => $category,
+                    'description' => $description,
+                    'fileName' => $originalFileName,
+                    'extension' => $extension
+                ],
+                [
+                    'error' => 'Error uploading document: ' . $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ],
+                'error',
+                $request->input('userID')
+            );
             
             return response()->json([
                 'success' => false,
