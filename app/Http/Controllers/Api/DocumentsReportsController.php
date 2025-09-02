@@ -66,9 +66,13 @@ class DocumentsReportsController extends Controller
     // using IRIS NOA API for creating base64 encoded PDF
     public function callNOAIRISAPI(Request $request)
     {    
+        $debtorsArr = [];
+        if ($request->DebtorKey) {
+            $debtorsArr = array_map('intval', array_map('trim', explode(',', $request->DebtorKey)));
+        }
         $postfields = array(
-            'clientkey' => $request->ClientKey ?? null, // e.g. 11568
-            'debtorkey' => $request->DebtorKey ?? null, // e.g. 72020
+            'clientkey' => $request->ClientKey ?? null, // e.g. 4931
+            'debtorkey' => $debtorsArr ?? null, // e.g. [79855,77613],
             'factor_signature' => $request->factor_signature ?? 0,
             'acknowledge_signature' => $request->acknowledge_signature ?? 1,
             'bankingdetails' => $request->bankingdetails ?? 0,
@@ -78,9 +82,10 @@ class DocumentsReportsController extends Controller
             'email_client' => $request->email_client ?? 0,
             'email_crm' => $request->email_crm ?? 0,
             'email_address' => $request->email_address ?? '',
-            'email_contactname' => $request->email_contactname ?? '', // need for email template
-            'email_contactemail' => $request->email_contactemail ?? '', // need for email template
+            'email_contactname' => $request->email_contactname ?? '', 
+            'email_contactemail' => $request->email_contactemail ?? '', 
             'email_contactext' => $request->email_contactext ?? '',
+            'userkey' => $request->header('X-User-Id')
         );
         // $postfields = array(
         //     'clientkey' => $request->ClientKey ?? null, // e.g. 11568
@@ -100,8 +105,8 @@ class DocumentsReportsController extends Controller
         // );
         $postfields = json_encode($postfields);
         
-        $url = "https://login.baron.finance/iris/public/api/noa/create_noa.php";
-        // $url = "https://iris.revinc.com/iris/public/api/noa/create_noa.php";
+        // $url = "https://login.baron.finance/iris/public/api/noa/create_noa.php";
+        $url = "https://iris.revinc.com/iris/public/api/noa/create_noa.php";
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -131,26 +136,46 @@ class DocumentsReportsController extends Controller
         $result = "";
         $resultType = "";
         $results = json_decode($response, true);
-        if (isset($results['noa'])) {
-            $resultType = "noa";
-            $result = $results['noa'];
-        }
-        if (isset($results['araging'])) {
-            $resultType = "araging";
-            $result = $results['araging'];
-        }
-        if (isset($results['bankingdetails'])) {
-            $resultType = "bankingdetails";
-            $result = $results['bankingdetails'];
-        }
-        if (isset($results['email_sent'])) {
-            $resultType = "email_sent";
-            $result = $results['email_sent'];
+        // if (isset($results['noa'])) {
+        //     $resultType = "noa";
+        //     $result = $results['noa'];
+        // }
+        // if (isset($results['araging'])) {
+        //     $resultType = "araging";
+        //     $result = $results['araging'];
+        // }
+        // if (isset($results['bankingdetails'])) {
+        //     $resultType = "bankingdetails";
+        //     $result = $results['bankingdetails'];
+        // }
+        // if (isset($results['email_sent'])) {
+        //     $resultType = "email_sent";
+        //     $result = $results['email_sent'];
+        // }
+
+        $finalResult = '';
+        $finalResultType = 'email_sent';
+
+        if (isset($results)) {
+            for ($i = 0; $i < count($results); $i++) {
+                if (isset($results[$i]['noa'])) {
+                    $finalResult = $results[$i]['noa'];
+                    $finalResultType = "noa";
+                }
+                if (isset($results[$i]['araging'])) {
+                    $finalResult = $results[$i]['araging'];
+                    $finalResultType = "araging";
+                }
+                if (isset($results['bankingdetails'])) {
+                    $finalResult = $results['bankingdetails'];
+                    $finalResultType = "bankingdetails";
+                }
+            }
         }
         
         return response()->json([
-            'result' => $result,
-            'resultType' => $resultType,
+            'result' => $finalResult,
+            'resultType' => $finalResultType,
         ]);
     }
 
@@ -168,7 +193,8 @@ class DocumentsReportsController extends Controller
         $postfields = json_encode($postfields);
         
         //$url = "http://localhost/iris/public/api/ansonia/report_url.php";
-        $url = "https://login.baron.finance/iris/public/api/ansonia/report_url.php";
+        // $url = "https://login.baron.finance/iris/public/api/ansonia/report_url.php";
+        $url = "https://iris.revinc.com/iris/public/api/ansonia/report_url.php";
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -186,6 +212,7 @@ class DocumentsReportsController extends Controller
         
         return response()->json([
             'url' => $response,
+            'message' => 'Ansonia API called successfully'
         ]);
     }
 
@@ -199,7 +226,8 @@ class DocumentsReportsController extends Controller
         $postfields = json_encode($postfields);
 
         //$url = "http://localhost/iris/public/api/invoice_image/create.php";
-        $url = "https://login.baron.finance/iris/public/api/invoice_image/create.php";
+        // $url = "https://login.baron.finance/iris/public/api/invoice_image/create.php";
+        $url = "https://iris.revinc.com/iris/public/api/invoice_image/create.php";
 
 
         $ch = curl_init();

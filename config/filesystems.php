@@ -45,6 +45,7 @@ return [
         ],
 
         'payment_images' => [
+            'driver' => 'local',
             'root' => storage_path('app/public/payment_images'),
         ],
 
