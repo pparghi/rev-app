@@ -670,4 +670,17 @@ class DocumentsReportsController extends Controller
 
     //endregion clients documents
 
+    
+    //region dashboard reports
+    // getting full debtor list for generating excel report
+    public function getFullDebtorListForReport(Request $request)
+    {
+        $data = DB::select('web.SP_DebtorListAll');
+        
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+    //endregion dashboard reports
+
 }

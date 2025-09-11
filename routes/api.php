@@ -86,6 +86,7 @@ Route::get('getClientDocumentList', [DocumentsReportsController::class, 'getClie
 Route::get('showFile', [DocumentsReportsController::class, 'showFile']); 
 Route::get('getClientFullList', [DocumentsReportsController::class, 'getClientFullList']); 
 Route::post('uploadClientDocument', [DocumentsReportsController::class, 'uploadClientDocument']);
+Route::get('getFullDebtorListForReport', [DocumentsReportsController::class, 'getFullDebtorListForReport']);
 Route::get('getInvoiceStatusList', [InvoiceSearchController::class, 'getInvoiceStatusList']); 
 Route::get('getDisputeCodeList', [InvoiceSearchController::class, 'getDisputeCodeList']); 
 Route::get('getInvoicesList', [InvoiceSearchController::class, 'getInvoicesList']); 
