@@ -127,8 +127,8 @@ class DocumentsReportsController extends Controller
             'NOA_IRIS_API',
             json_decode($postfields, true),
             json_decode($response, true),
-            curl_errno($ch) ? 'error #: '+ curl_errno($ch) + '; error detail: '+ curl_error($ch): 'success',
-            $request->header('X-User-Id') 
+            curl_errno($ch) ? 'error #: ' . curl_errno($ch) . '; error detail: ' . curl_error($ch) : 'success',
+            $request->header('X-User-Id')
         );
 
         curl_close($ch);
