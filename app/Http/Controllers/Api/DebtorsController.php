@@ -249,9 +249,10 @@ class DebtorsController extends Controller
             $Phone2 = $request->Phone2 ? $request->Phone2 : '';
             $City = $request->City ? $request->City : '';
             $State = $request->State ? $request->State : '';
+            $Country = $request->Country ? $request->Country : NULL;
             $TotalCreditLimit = $request->TotalCreditLimit ? $request->TotalCreditLimit : '';
             $IndivCreditLimit = $request->IndivCreditLimit ? $request->IndivCreditLimit : '';
-            $AIGLimit = $request->AIGLimit ? $request->AIGLimit : '';
+            $AIGLimit = $this->cleanNumericValue($request->AIGLimit);
             $Terms = $request->Terms ? $request->Terms : '';
             $MotorCarrNo = $request->MotorCarrNo ? $request->MotorCarrNo : '';
             $CredAppBy = $request->CredAppBy ? $request->CredAppBy : '';
@@ -263,7 +264,7 @@ class DebtorsController extends Controller
             $Warning = $request->Warning ? $request->Warning : '';
             $DotNo = $request->DotNo ? $request->DotNo : '';
 
-            $result = DB::select('web.SP_DebtorChangeDetails @DebtorKey = ?, @Name = ?, @DbDunsNo = ?, @Addr1 = ?, @Addr2 = ?, @Phone1 = ?, @Phone2 = ?, @City = ?, @State = ?, @TotalCreditLimit = ?, @IndivCreditLimit = ?, @AIGLimit = ?, @Terms = ?, @MotorCarrNo = ?, @CredAppBy = ?, @Email = ?, @RateDate = ?, @CredExpireMos = ?, @Notes = ?, @CredNote = ?, @Warning = ?, @DotNo = ?', [$DebtorKey, $Debtor, $Duns, $Addr1, $Addr2, $Phone1, $Phone2, $City, $State, $TotalCreditLimit, $IndivCreditLimit, $AIGLimit, $Terms, $MotorCarrNo, $CredAppBy, $Email, $RateDate, $CredExpireMos, $Notes, $CredNote, $Warning, $DotNo]);            
+            $result = DB::select('web.SP_DebtorChangeDetails @DebtorKey = ?, @Name = ?, @DbDunsNo = ?, @Addr1 = ?, @Addr2 = ?, @Phone1 = ?, @Phone2 = ?, @City = ?, @State = ?, @Country = ?, @TotalCreditLimit = ?, @IndivCreditLimit = ?, @AIGLimit = ?, @Terms = ?, @MotorCarrNo = ?, @CredAppBy = ?, @Email = ?, @RateDate = ?, @CredExpireMos = ?, @Notes = ?, @CredNote = ?, @Warning = ?, @DotNo = ?', [$DebtorKey, $Debtor, $Duns, $Addr1, $Addr2, $Phone1, $Phone2, $City, $State, $Country, $TotalCreditLimit, $IndivCreditLimit, $AIGLimit, $Terms, $MotorCarrNo, $CredAppBy, $Email, $RateDate, $CredExpireMos, $Notes, $CredNote, $Warning, $DotNo]);            
             return response()->json(
                 $result,
             );
@@ -379,6 +380,28 @@ class DebtorsController extends Controller
         } catch(Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    private function cleanNumericValue($value)
+    {
+        if (empty($value) || $value === '' || $value === null) {
+            return null;
+        }
+
+        // Remove commas, spaces, and other formatting
+        $cleaned = preg_replace('/[^\d.-]/', '', $value);
+
+        // Validate it's a proper number
+        if (is_numeric($cleaned)) {
+            // Convert to appropriate type
+            if (strpos($cleaned, '.') !== false) {
+                return (float) $cleaned;
+            } else {
+                return (int) $cleaned;
+            }
+        }
+
+        return null;
     }
 
 }
