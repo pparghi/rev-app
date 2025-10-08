@@ -402,6 +402,65 @@ class DebtorsController extends Controller
         }
 
         return null;
+        
     }
+
+    // getting the country & area List 
+    public function getCountryAreaList()
+    {
+        $data = DB::select('web.SP_CountryList');
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    //region alternate addresses
+    // getting the Debtor No Buy Code List 
+    public function getDebtorAlternateAddresses(Request $request)
+    {
+        $data = DB::select('web.SP_DebtorAltAddressList @DebtorKey = ?' , [$request->DebtorKey]);
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    // method to delete debtor's alternate address
+    public function deleteDebtorAlternateAddress(Request $request){
+        try {
+            $DebtorKey = $request->DebtorKey ? $request->DebtorKey : '';
+            $AltAddressKey = $request->AltAddressKey ? $request->AltAddressKey : '';
+            $UpdateBy = $request->UpdateBy ? $request->UpdateBy : '';
+            DB::statement('web.SP_DebtorAltAddressDel @DebtorKey = ?, @AltAddressKey = ?, @UpdateBy = ?', [$DebtorKey, $AltAddressKey, $UpdateBy]);
+
+            return response()->json(['message' => 'Debtor alternate address deleted successfully']);
+        } catch(Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    // method to add debtor's alternate address
+    public function addDebtorAlternateAddress(Request $request){
+        try {
+            $DebtorKey = $request->DebtorKey ? $request->DebtorKey : '';
+            $Name = $request->Name ? $request->Name : '';
+            $Addr1 = $request->Addr1 ? $request->Addr1 : '';
+            $Addr2 = $request->Addr2 ? $request->Addr2 : '';
+            $City = $request->City ? $request->City : '';
+            $State = $request->State ? $request->State : '';
+            $ZipCode = $request->ZipCode ? $request->ZipCode : '';
+            $Country = $request->Country ? $request->Country : '';
+            $UpdateBy = $request->UpdateBy ? $request->UpdateBy : '';
+            DB::statement('web.SP_DebtorAltAddressAdd @DebtorKey = ?, @Name = ?, @Addr1 = ?, @Addr2 = ?, @City = ?, @State = ?,  @ZipCode= ?, @Country = ?, @UpdateBy= ?', [$DebtorKey, $Name, $Addr1, $Addr2, $City, $State, $ZipCode, $Country, $UpdateBy]);
+
+            return response()->json(['message' => 'Debtor alternate address added successfully']);
+        } catch(Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+
 
 }
