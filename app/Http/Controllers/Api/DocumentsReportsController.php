@@ -105,16 +105,6 @@ class DocumentsReportsController extends Controller
         // );
         $postfields = json_encode($postfields);
 
-        if ($request->email_debtor === '1'){
-            $this->apiLogger->logApiCall(
-                'NOA_IRIS_API',
-                json_decode($postfields, true),
-                'No response',
-                'Attempting to send NOA email',
-                $request->header('X-User-Id')
-            );
-        }
-        
         // $url = "https://login.baron.finance/iris/public/api/noa/create_noa.php";
         $url = "https://iris.revinc.com/iris/public/api/noa/create_noa.php";
         
@@ -187,6 +177,79 @@ class DocumentsReportsController extends Controller
             'result' => $finalResult,
             'resultType' => $finalResultType,
         ]);
+    }
+
+    // using IRIS NOA API for creating base64 encoded PDF
+    public function callNOAIRISAPISendBulkEmail(Request $request)
+    {
+        try {
+            $debtorsArr = [];
+            if ($request->DebtorKey) {
+                $debtorsArr = array_map('intval', array_map('trim', explode(',', $request->DebtorKey)));
+            }
+
+            $postfields = array(
+                'clientkey' => $request->ClientKey ?? null,
+                'debtorkey' => $debtorsArr ?? null,
+                'factor_signature' => $request->factor_signature ?? 0,
+                'acknowledge_signature' => $request->acknowledge_signature ?? 1,
+                'bankingdetails' => $request->bankingdetails ?? 0,
+                'bankingdetails_included' => $request->bankingdetails_included ?? 1,
+                'araging' => $request->araging ?? 0,
+                'email_debtor' => $request->email_debtor ?? 0,
+                'email_client' => $request->email_client ?? 0,
+                'email_crm' => $request->email_crm ?? 0,
+                'email_address' => $request->email_address ?? '',
+                'email_contactname' => $request->email_contactname ?? '',
+                'email_contactemail' => $request->email_contactemail ?? '',
+                'email_contactext' => $request->email_contactext ?? '',
+                'userkey' => $request->header('X-User-Id')
+            );
+            $postfields = json_encode($postfields);
+
+            $this->apiLogger->logApiCall(
+                'NOA_IRIS_API_Send_Bulk_Email',
+                json_decode($postfields, true),
+                'Fire-and-forget request initiated',
+                'Attempting to send NOA email asynchronously',
+                $request->header('X-User-Id')
+            );
+
+            // Make async request in background
+            $this->sendAsyncRequest($postfields);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Bulk email request has been initiated'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to initiate bulk email request: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function sendAsyncRequest($postfields)
+    {
+        $url = "https://iris.revinc.com/iris/public/api/noa/create_noa.php";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-type: application/json"));
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);   // Don't return response
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_NOBODY, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 1);              // 1 second timeout
+        curl_setopt($ch, CURLOPT_NOSIGNAL, 1);             // Avoid signals
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postfields);
+
+        curl_exec($ch);
+        curl_close($ch);
     }
 
     // using IRIS Ansonia API for creating report url
@@ -854,7 +917,7 @@ class DocumentsReportsController extends Controller
             }
             
             // Create the final filename using DocHdrKey
-            $newFileName = $docHdrKey . 'Test.' . $extension;
+            $newFileName = $docHdrKey . '.' . $extension;
             // $finalPath = $destinationPath . '\\' . $newFileName;
             
             // Move the file to the final destination

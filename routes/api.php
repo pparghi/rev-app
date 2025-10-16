@@ -81,6 +81,7 @@ Route::get('getDebtorsListByClientKey', [DocumentsReportsController::class, 'get
 Route::get('getNOADebtorsListByClientKey', [DocumentsReportsController::class, 'getNOADebtorsListByClientKey']); 
 Route::get('getDebtorsListByName', [DocumentsReportsController::class, 'getDebtorsListByName']); 
 Route::get('callNOAIRISAPI', [DocumentsReportsController::class, 'callNOAIRISAPI']); 
+Route::post('callNOAIRISAPISendBulkEmail', [DocumentsReportsController::class, 'callNOAIRISAPISendBulkEmail']); 
 Route::get('callAnsoniaAPI', [DocumentsReportsController::class, 'callAnsoniaAPI']); 
 Route::get('callInvoiceImageAPI', [DocumentsReportsController::class, 'callInvoiceImageAPI']); 
 Route::get('callLORCreatePDFAPI', [DocumentsReportsController::class, 'callLORCreatePDFAPI']); 
