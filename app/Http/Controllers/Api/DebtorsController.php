@@ -249,6 +249,7 @@ class DebtorsController extends Controller
             $Phone2 = $request->Phone2 ? $request->Phone2 : '';
             $City = $request->City ? $request->City : '';
             $State = $request->State ? $request->State : '';
+            $ZipCode = $request->ZipCode ? $request->ZipCode : NULL;
             $Country = $request->Country ? $request->Country : NULL;
             $TotalCreditLimit = $request->TotalCreditLimit ? $request->TotalCreditLimit : '';
             $IndivCreditLimit = $request->IndivCreditLimit ? $request->IndivCreditLimit : '';
@@ -264,7 +265,7 @@ class DebtorsController extends Controller
             $Warning = $request->Warning ? $request->Warning : '';
             $DotNo = $request->DotNo ? $request->DotNo : '';
 
-            $result = DB::select('web.SP_DebtorChangeDetails @DebtorKey = ?, @Name = ?, @DbDunsNo = ?, @Addr1 = ?, @Addr2 = ?, @Phone1 = ?, @Phone2 = ?, @City = ?, @State = ?, @Country = ?, @TotalCreditLimit = ?, @IndivCreditLimit = ?, @AIGLimit = ?, @Terms = ?, @MotorCarrNo = ?, @CredAppBy = ?, @Email = ?, @RateDate = ?, @CredExpireMos = ?, @Notes = ?, @CredNote = ?, @Warning = ?, @DotNo = ?', [$DebtorKey, $Debtor, $Duns, $Addr1, $Addr2, $Phone1, $Phone2, $City, $State, $Country, $TotalCreditLimit, $IndivCreditLimit, $AIGLimit, $Terms, $MotorCarrNo, $CredAppBy, $Email, $RateDate, $CredExpireMos, $Notes, $CredNote, $Warning, $DotNo]);            
+            $result = DB::select('web.SP_DebtorChangeDetails @DebtorKey = ?, @Name = ?, @DbDunsNo = ?, @Addr1 = ?, @Addr2 = ?, @Phone1 = ?, @Phone2 = ?, @City = ?, @State = ?, @Country = ?, @ZipCode = ?, @TotalCreditLimit = ?, @IndivCreditLimit = ?, @AIGLimit = ?, @Terms = ?, @MotorCarrNo = ?, @CredAppBy = ?, @Email = ?, @RateDate = ?, @CredExpireMos = ?, @Notes = ?, @CredNote = ?, @Warning = ?, @DotNo = ?', [$DebtorKey, $Debtor, $Duns, $Addr1, $Addr2, $Phone1, $Phone2, $City, $State, $Country, $ZipCode, $TotalCreditLimit, $IndivCreditLimit, $AIGLimit, $Terms, $MotorCarrNo, $CredAppBy, $Email, $RateDate, $CredExpireMos, $Notes, $CredNote, $Warning, $DotNo]);            
             return response()->json(
                 $result,
             );
