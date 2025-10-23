@@ -97,12 +97,12 @@ Route::post('uploadAgingDocument', [DocumentsReportsController::class, 'uploadAg
 Route::get('getInvoiceStatusList', [InvoiceSearchController::class, 'getInvoiceStatusList']); 
 Route::get('getDisputeCodeList', [InvoiceSearchController::class, 'getDisputeCodeList']); 
 Route::get('getInvoicesList', [InvoiceSearchController::class, 'getInvoicesList']); 
-Route::get('/paymentsFiles/{filename}', function ($filename) {
-    $path = public_path('payment_images/' . $filename);
+// Route::get('/paymentsFiles/{filename}', function ($filename) {
+//     $path = public_path('payment_images/' . $filename);
 
-    if (!File::exists($path)) {
-        abort(404);
-    }
+//     if (!File::exists($path)) {
+//         abort(404);
+//     }
 
-    return response()->file($path); 
-});
+//     return response()->file($path); 
+// });
