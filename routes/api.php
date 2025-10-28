@@ -37,6 +37,7 @@ Route::post('updateDebtorNoBuyCode', [DebtorsController::class, 'updateDebtorNoB
 Route::get('getDebtorAlternateAddresses', [DebtorsController::class, 'getDebtorAlternateAddresses']);
 Route::post('deleteDebtorAlternateAddress', [DebtorsController::class, 'deleteDebtorAlternateAddress']);
 Route::post('addDebtorAlternateAddress', [DebtorsController::class, 'addDebtorAlternateAddress']);
+Route::get('getDebtorAlertsList', [DebtorsController::class, 'getDebtorAlertsList']);
 // Route::post('updateDebtorCreditLimit', [DebtorsController::class, 'updateCreditLimit']);
 // Route::post('updateDebtorAccountStatus', [DebtorsController::class, 'updateAccountStatus']);
 Route::resource('memberDebtors', MemberDebtorsController::class)->except(['create', 'store', 'show', 'edit', 'update', 'destroy']);

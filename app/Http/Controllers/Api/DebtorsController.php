@@ -266,6 +266,16 @@ class DebtorsController extends Controller
             $DotNo = $request->DotNo ? $request->DotNo : '';
 
             $result = DB::select('web.SP_DebtorChangeDetails @DebtorKey = ?, @Name = ?, @DbDunsNo = ?, @Addr1 = ?, @Addr2 = ?, @Phone1 = ?, @Phone2 = ?, @City = ?, @State = ?, @Country = ?, @ZipCode = ?, @TotalCreditLimit = ?, @IndivCreditLimit = ?, @AIGLimit = ?, @Terms = ?, @MotorCarrNo = ?, @CredAppBy = ?, @Email = ?, @RateDate = ?, @CredExpireMos = ?, @Notes = ?, @CredNote = ?, @Warning = ?, @DotNo = ?', [$DebtorKey, $Debtor, $Duns, $Addr1, $Addr2, $Phone1, $Phone2, $City, $State, $Country, $ZipCode, $TotalCreditLimit, $IndivCreditLimit, $AIGLimit, $Terms, $MotorCarrNo, $CredAppBy, $Email, $RateDate, $CredExpireMos, $Notes, $CredNote, $Warning, $DotNo]);            
+            
+            // Log the API call
+            $this->apiLogger->logApiCall(
+                'update_Debtor_Details',
+                $request->all(),
+                $result,
+                'success',
+                $request->CredAppBy ? $request->CredAppBy : 'UNKNOWN'
+            );
+            
             return response()->json(
                 $result,
             );
@@ -461,6 +471,20 @@ class DebtorsController extends Controller
         }
     }
 
+    //endregion alternate addresses
+
+    //region debtor alerts
+    // getting the Debtor alert List 
+    public function getDebtorAlertsList(Request $request)
+    {
+        $data = DB::select('web.SP_AlertsList');
+
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
+    //endregion debtor alerts
 
 
 
