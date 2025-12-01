@@ -75,6 +75,8 @@ Route::get('getCreditRequestStatusList', [TicketingController::class, 'getCredit
 Route::post('approveCreditRequest', [TicketingController::class, 'approveCreditRequest']); 
 Route::post('approveCreditRequest2', [TicketingController::class, 'approveCreditRequest2']); 
 Route::get('actionToCreditRequest', [TicketingController::class, 'actionToCreditRequest']); 
+Route::get('getRelationshipDataList', [TicketingController::class, 'getRelationshipDataList']); 
+Route::post('updateRelationshipDataList', [TicketingController::class, 'updateRelationshipDataList']); 
 Route::get('invoiceDetailNotes', [ClientsInvoicesController::class, 'invoiceDetailNotes']); 
 Route::post('ClientNotesHide', [RiskMonitoringController::class, 'ClientNotesHide']);
 Route::get('getClientsList', [DocumentsReportsController::class, 'getClientsList']); 

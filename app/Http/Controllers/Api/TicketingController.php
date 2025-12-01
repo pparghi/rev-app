@@ -233,4 +233,141 @@ class TicketingController extends Controller
             ], 500);
         }
     }
+
+    // get debtor client relationship data
+    public function getRelationshipDataList(Request $request)
+    {       
+        // Validate request parameters
+        $request->validate([
+            'ClientKey' => 'required|integer|min:1',
+            'DebtorKey' => 'required|integer|min:1'
+        ]);
+
+        $ClientKey = $request->ClientKey;
+        $DebtorKey = $request->DebtorKey;
+
+        try {
+            $data = DB::select('Web.SP_RelationshipDataList @ClientKey = ?, @DebtorKey = ?',  [$ClientKey, $DebtorKey]);
+
+            return response()->json([
+                'data' => $data,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error retrieving relationship data:', [
+                'error' => $e->getMessage(),
+                'ClientKey' => $ClientKey,
+                'DebtorKey' => $DebtorKey
+            ]);
+
+            return response()->json([
+                'error' => 'Failed to retrieve relationship data',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // modify relationship data
+    public function updateRelationshipDataList(Request $request)
+    {
+        // Validate request parameters
+        $request->validate([
+            'Agingkey' => 'required|integer|min:1',
+            'CreditLimit' => 'nullable|numeric|min:0',
+            'CredAppBy' => 'nullable|string|max:50',
+            'RateDate' => 'nullable|date',
+            'CredExpireDate' => 'nullable|date',
+            'CredExpireMos' => 'nullable|integer|min:0',
+            'NoBuyDesc' => 'nullable|string|max:100',
+            'NoBuyDisputeKey' => 'nullable|integer|min:0'
+        ]);
+
+        try {
+            $result = DB::select('Web.SP_RelationshipDataListChange 
+                @Agingkey = ?, 
+                @CreditLimit = ?, 
+                @CredAppBy = ?, 
+                @RateDate = ?, 
+                @CredExpireDate = ?, 
+                @CredExpireMos = ?, 
+                @NoBuyDesc = ?, 
+                @NoBuyDisputeKey = ?', 
+                [
+                    $request->Agingkey,
+                    $request->CreditLimit,
+                    $request->CredAppBy,
+                    $request->RateDate,
+                    $request->CredExpireDate,
+                    $request->CredExpireMos,
+                    $request->NoBuyDesc,
+                    $request->NoBuyDisputeKey
+                ]
+            );
+
+            // Check if the stored procedure returned an error
+            if (!empty($result) && isset($result[0]->Result)) {
+                if ($result[0]->Result === 'Success') {
+                    // Log successful API call
+                    $this->apiLogger->logApiCall(
+                        'SP_RelationshipDataListChange',
+                        $request->all(),
+                        $result,
+                        'success',
+                        $request->CredAppBy
+                    );
+
+                    return response()->json([
+                        'message' => 'Relationship data updated successfully',
+                        'result' => $result[0]->Result
+                    ]);
+                } else {
+                    // Log failed API call (business logic error)
+                    $this->apiLogger->logApiCall(
+                        'SP_RelationshipDataListChange',
+                        $request->all(),
+                        $result,
+                        'error',
+                        $request->CredAppBy
+                    );
+
+                    return response()->json([
+                        'error' => 'Update failed',
+                        'message' => $result[0]->Result
+                    ], 400);
+                }
+            }
+
+            // Log successful API call (no specific result returned)
+            $this->apiLogger->logApiCall(
+                'SP_RelationshipDataListChange',
+                $request->all(),
+                ['message' => 'Relationship data updated successfully'],
+                'success',
+                $request->CredAppBy
+            );
+
+            return response()->json([
+                'message' => 'Relationship data updated successfully'
+            ]);
+
+        } catch(\Exception $e) {
+            // Log exception case
+            $this->apiLogger->logApiCall(
+                'SP_RelationshipDataListChange',
+                $request->all(),
+                ['error' => $e->getMessage()],
+                'error',
+                $request->CredAppBy ?? null
+            );
+
+            \Log::error('Error updating relationship data:', [
+                'error' => $e->getMessage(),
+                'parameters' => $request->all()
+            ]);
+
+            return response()->json([
+                'error' => 'Failed to update relationship data', 
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
