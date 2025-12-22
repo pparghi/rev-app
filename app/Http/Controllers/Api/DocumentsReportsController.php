@@ -340,7 +340,8 @@ class DocumentsReportsController extends Controller
             'marknobuy' => $request->Marknobuy ?? 0,
             'watermark' => $request->Watermark ?? 0,
             'userkey' => $request->header('X-User-Id'),
-            'email_debtor' => $request->EmailDebtor ?? 0
+            'email_debtor' => $request->EmailDebtor ?? 0,
+            'french' => $request->French ?? false
         );
         $postfields = json_encode($postfields);
         
@@ -385,7 +386,8 @@ class DocumentsReportsController extends Controller
             'watermark' => $request->Watermark ?? 0,
             'sendemail' => $request->Sendemail ?? 0,
             'userkey' => $request->header('X-User-Id'),
-            'userExtension' => $request->UserExtension ?? ''
+            'userExtension' => $request->UserExtension ?? '',
+            'french' => $request->French ?? false
         );
         // $postfields = array(
         //     'clientkey' => $request->ClientKey,
